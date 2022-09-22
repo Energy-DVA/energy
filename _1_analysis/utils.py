@@ -1,26 +1,6 @@
 import pandas as pd
 from prodphecy import normalize_date_freq
-
-
-DROP_PROD_COLS = [
-    "LEASE",
-    "DOR_CODE",
-    "API_NUMBER",
-    "FIELD",
-    "PRODUCING_ZONE",
-    "OPERATOR",
-    "COUNTY",
-    "TOWNSHIP",
-    "TWN_DIR",
-    "RANGE",
-    "RANGE_DIR",
-    "SECTION",
-    "SPOT",
-    "LATITUDE",
-    "LONGITUDE",
-    "PRODUCT",
-    "URL",
-]
+from _1_analysis.db_schema import DROP_PROD_COLS
 
 
 def convert_month_year(row, date_col="DATE", prod_col="PRODUCTION"):
@@ -29,7 +9,8 @@ def convert_month_year(row, date_col="DATE", prod_col="PRODUCTION"):
     x[prod_col] = x[prod_col] / 12
     x.set_index(date_col, inplace=True)
     x = x.reindex(dates, method="ffill")
-    return x.reset_index().to_numpy()
+    x = x.reset_index().rename({"index": date_col}, axis=1)[row.index]
+    return x.to_numpy()
 
 
 def preprocess_prod(df_prod, id_col, date_col, wells_col, prod_col):
@@ -64,7 +45,7 @@ def preprocess_prod(df_prod, id_col, date_col, wells_col, prod_col):
         .reset_index(0, drop=True)
         .reset_index()
     )
-    df = pd.concat([df, df_year])
+    df = pd.concat([df, df_year[df.columns]])
     return df
 
 
