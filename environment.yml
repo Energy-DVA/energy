@@ -1,0 +1,8 @@
+name: energy_2
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - geopandas
+  - sqlalchemy
+  - seaborn
