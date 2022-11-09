@@ -22,15 +22,7 @@ def log(stuff):
 def draw_base_map():
     fig = go.Figure()
     midpoint = (38.48470, -98.38020) # (Lat,Lon)
-
-    # fig = px.choropleth_mapbox(kansas_state, geojson=kansas_geojson, locations="GEOID", color="LSAD",
-    #                             opacity=0.5, center={"lat": point[0], "lon": point[1]},
-    #                             color_continuous_scale="gray", range_color=[0,8],
-    #                             zoom = 6)
-    # fig.update_layout(mapbox_style="light", mapbox_accesstoken=mapbox_access_token,
-    #                 mapbox_zoom=3, mapbox_center = {"lat": 37.0902, "lon": -95.7129})
-    # fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-
+    # Add Counties shaders
     fig.add_trace(
         go.Choroplethmapbox(geojson=kansas_geojson, locations=kansas_state["GEOID"], z=kansas_state["LSAD"],
                             marker_opacity=0.5, marker_line_width=0,
@@ -42,13 +34,7 @@ def draw_base_map():
                                         "<extra></extra>"
         )
     )
-
-    # fig = px.choropleth_mapbox(kansas_state, geojson=kansas_geojson, locations="GEOID", color="LSAD",
-    #                             opacity=0.5, center={"lat": midpoint[0], "lon": midpoint[1]},
-    #                             color_continuous_scale="gray", range_color=[0,8],
-    #                             zoom = 6)
-
-    # Add counties
+    # Add counties borders
     fig.update_layout(
         mapbox={
             "style": "open-street-map",
@@ -65,19 +51,130 @@ def draw_base_map():
             #"bounds" : {"west": -180, "east": -50, "south": 20, "north": 90},
             "center" : {"lat": midpoint[0], "lon": midpoint[1]}
         },
-        margin={"l": 0, "r": 50, "t": 0, "b": 0},
+        margin={"l": 0, "r": 5, "t": 0, "b": 0},
         mapbox_style="open-street-map",#"white-bg",
         autosize = True,
         height = 600,
-        dragmode='lasso',
+        #dragmode='lasso',
         newselection=dict(line=dict(color="Crimson",
                                     width=2,
                                     dash="dash")),
+                                    
+        modebar = {
+            'orientation': 'h',
+            'bgcolor': 'rgba(255,255,255,0.7)',
+            'color': 'rgb(255,0,0)',
+            'activecolor': 'rgb(100,0,200)',
+        },
     )
 
     fig.update_geos(fitbounds="locations", visible=False)
-    
+    fig['layout']['uirevision'] = 'base'
     return fig
+
+def develop_cards():
+
+    production_card = dbc.Card(
+        [
+            dbc.CardHeader("Production Type"),
+            dbc.CardBody(
+                [
+                    dcc.Dropdown(
+                        id="commodity",
+                        options=["All","Oil","Gas"],
+                        value="All",
+                    ),
+                ]
+            ),
+        ],
+        body=True
+    )
+
+    active_card = dbc.Card(
+        [
+            dbc.CardHeader("Activity"),
+            dbc.CardBody(
+                [
+                    dcc.Dropdown(
+                        id="activity",
+                        options=["All","Active","Inactive"],
+                        value="All",
+                    ),
+                ]
+            ),
+        ],
+        body=True
+    )
+
+    counties_card = dbc.Card(
+        [
+            dbc.CardHeader("County"),
+            dbc.CardBody(
+                [
+                    dcc.Dropdown(
+                        id="county",
+                        options=['All']+counties,
+                        value="All",
+                    ),
+                ]
+            ),
+        ], 
+        body=True
+    )
+
+    map_type_card = dbc.Card(
+        [
+            dbc.CardHeader("Lease Visualizations"),
+            dbc.CardBody(
+                [
+                    dcc.RadioItems(
+                        id="map_type",
+                        options=[
+                                    {'label': 'None', 'value': 'None'},
+                                    {'label': 'Individual Leases', 'value': 'Scatter Plot'},
+                                    {'label': 'Density', 'value': 'Heat Map'}
+                                ],
+                        value='None',
+                        inputStyle={"margin-right": "5px"}
+                    ),
+                ]
+            ),
+        ], 
+        body=True
+    )
+
+    map_controls_card = dbc.Card(
+        [
+            dbc.CardHeader("Map Controls"),
+            dbc.CardBody(
+                [
+                    dbc.Button("Reset View", color="primary", className="mt-auto", id='reset_view'),
+                ]
+            ),
+        ], 
+        body=True
+    )
+
+    controls = html.Div(
+        [
+            dbc.Row(
+                [
+                    dbc.Col(map_controls_card),
+                    dbc.Col(map_type_card),
+                ], className="mb-4"
+            ),
+            dbc.Row(
+                [
+                    dbc.Col(counties_card),
+                    dbc.Col(production_card),
+                    dbc.Col(active_card),
+                ],
+                className="mb-4"
+            )
+        ]
+    )
+
+    return controls
 
 ########################################################################
 
@@ -120,79 +217,16 @@ map_config = {
                 'scrollZoom': True,
             }
 
-production_card = dbc.Card(
-    dbc.CardBody(
-        [
-            html.H5("Production Type", className="card-title"),
-            dcc.Dropdown(
-                id="commodity",
-                options=["Oil","Gas"],
-                value="Select",
-            ),
-        ]
-    ), 
-    body=True
-)
-
-active_card = dbc.Card(
-    dbc.CardBody(
-        [
-            html.H5("Activity", className="card-title"),
-            dcc.Dropdown(
-                id="activity",
-                options=["Active","Inactive"],
-                value="Select",
-            ),
-        ]
-    ), 
-    body=True
-)
-
-counties_card = dbc.Card(
-    dbc.CardBody(
-        [
-            html.H5("County", className="card-title"),
-            dcc.Dropdown(
-                id="county",
-                options=['All']+counties,
-                value="All",
-            ),
-        ]
-    ), 
-    body=True
-)
-
-controls = html.Div(
-    [
-        dbc.Row(
-            [
-                dbc.Col(production_card, width=4),
-                dbc.Col(active_card, width=4),
-            ]
-        ),
-        dbc.Row(
-            [
-                dbc.Col(counties_card, width=4),
-            ]
-        )
-    ]
-)
-
 app.layout = dbc.Container(
     [
         html.H1("Kansas Production Forecast"),
         html.Hr(),
         dbc.Row(
             [
-                dbc.Col(controls,md=4),
+                dbc.Col(develop_cards(), md=4),
                 dbc.Col(
                     [
-                        dcc.RadioItems(
-                            id="map_type",
-                            options=['Scatter Plot', 'Heat Map'],
-                            value='Heat Map'
-                        ),
-                        dcc.Graph(id="map", config=map_config)
+                        dcc.Graph(id="map", figure=draw_base_map(), config=map_config)
                     ],
                 md=8,
                 ),
@@ -209,60 +243,132 @@ app.layout = dbc.Container(
 ###################--- CALLBACKS ---##################################
 
 @app.callback(
-    Output("map", "figure"),
+    [
+        Output("map", "figure"),
+        Output("map_type", "value"),
+    ],
     [
         Input("map_type", "value"),
         Input("commodity", "value"),
         Input("activity", "value"),
-        Input("county", "value")
-    ])
-def drawn_polygon(map_type, commodity, active, county):
-    # Draw basemap
-    fig = draw_base_map()
+        Input("county", "value"),
+        Input("reset_view", "n_clicks"),
+    ],
+    prevent_initial_call=True
+)
+def drawn_polygon(map_type, commodity, active, county, reset_view):
 
+    if commodity == None:
+        commodity = 'All'
+    if active == None:
+        active = 'All'
+    if county == None:
+        county = 'All'
+    if map_type == None:
+        map_type = 'None'
+
+    if dash.callback_context.triggered_id == 'reset_view':
+        map_type = 'None'
+
+    # Draw base map
+    fig = draw_base_map()
+        
     # Retrieve Data
     s = select(
             [
                 lease.c.LEASE_KID,
                 lease.c.LATITUDE,
-                lease.c.LONGITUDE
+                lease.c.LONGITUDE,
+                lease.c.PRODUCES,
+                lease.c.YEAR_STOP,
             ]
     )
+    if commodity != 'All':
+        s = s.where(lease.c.PRODUCES == commodity.upper())
+    # else select all
+
     if county != 'All':
-        df = pd.read_sql(s.where(lease.c.COUNTY == county), engine)
-    else:
-        df = pd.read_sql(s, engine)
+        s = s.where(lease.c.COUNTY == county)
+    # else select all
+
+    if active == 'Active':
+        s = s.where(lease.c.YEAR_STOP == '2022')
+    elif active == 'Inactive':
+        s = s.where(lease.c.YEAR_STOP != '2022')
+    # else do all
     
+    df = pd.read_sql(s, engine)
     if map_type == "Heat Map":
         fig.add_trace(
             go.Densitymapbox(
                 lat=df['LATITUDE'],
                 lon=df['LONGITUDE'],
                 radius=2,
+                showscale=False,
             )
         )
-
     elif map_type == "Scatter Plot":
-        fig.add_trace(
-            go.Scattermapbox(
-                lat=df['LATITUDE'],
-                lon=df['LONGITUDE'],
-                mode='markers',
-                marker=go.scattermapbox.Marker(
-                    size=5
-                ),
-                showlegend=False,
-                text=df['LEASE_KID'],
-                customdata=kansas_state['NAME'],
-                hovertemplate=
-                    "<b>County</b><br>" +
-                    "%{customdata}<br>" +
-                    "<extra></extra>"
+        df_oil = df[df['PRODUCES']=='OIL']
+        df_gas = df[df['PRODUCES']=='GAS']
+        
+        if commodity=='All' or commodity=='Oil':
+            fig.add_trace(
+                go.Scattermapbox(
+                    lat=df_oil['LATITUDE'],
+                    lon=df_oil['LONGITUDE'],
+                    mode='markers',
+                    marker=go.scattermapbox.Marker(
+                        size=5,
+                        color='rgb(0,0,200)',
+                        opacity=0.25,
+                    ),
+                    text=df_oil['LEASE_KID'],
+                    customdata=kansas_state['NAME'],
+                    showlegend=True,
+                    legendgroup="scatter",
+                    name="Oil Leases",
+                    hovertemplate=
+                        "<b>County</b><br>" +
+                        "%{customdata}<br>" +
+                        "<extra></extra>"
+                )
             )
-        )
+
+        if commodity=='All' or commodity=='Gas':
+            fig.add_trace(
+                go.Scattermapbox(
+                    lat=df_gas['LATITUDE'],
+                    lon=df_gas['LONGITUDE'],
+                    mode='markers',
+                    marker=go.scattermapbox.Marker(
+                        size=5,
+                        color='rgb(0,200,0)',
+                        opacity=0.25,
+                    ),
+                    text=df_gas['LEASE_KID'],
+                    customdata=kansas_state['NAME'],
+                    showlegend=True,
+                    legendgroup="scatter",
+                    name="Gas Leases",
+                    hovertemplate=
+                        "<b>County</b><br>" +
+                        "%{customdata}<br>" +
+                        "<extra></extra>"
+                )
+            )
+    # else select None map
 
 
-    return fig
+    fig.update_layout(legend=dict(
+        yanchor="top",
+        y=0.99,
+        xanchor="left",
+        x=0.01
+    ))
+
+    fig['layout']['uirevision'] = 'base'
+    
+    return fig,map_type
 
 
 # @app.callback(
