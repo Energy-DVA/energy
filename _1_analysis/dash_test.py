@@ -18,7 +18,6 @@ from shapely.geometry import Point
 def log(stuff):
     app.logger.info(stuff)
 
-
 def draw_base_map():
     fig = go.Figure()
     midpoint = (38.48470, -98.38020) # (Lat,Lon)
@@ -38,7 +37,7 @@ def draw_base_map():
     fig.update_layout(
         mapbox={
             "style": "open-street-map",
-            "zoom": 6.25,
+            "zoom": 6,
             "layers": [
                 {
                     "source": kansas_geojson,
@@ -54,7 +53,7 @@ def draw_base_map():
         margin={"l": 0, "r": 5, "t": 0, "b": 0},
         mapbox_style="open-street-map",#"white-bg",
         autosize = True,
-        height = 600,
+        #height = 600,
         #dragmode='lasso',
         newselection=dict(line=dict(color="Crimson",
                                     width=2,
@@ -130,12 +129,12 @@ def develop_cards():
                     dcc.RadioItems(
                         id="map_type",
                         options=[
-                                    {'label': 'None', 'value': 'None'},
                                     {'label': 'Individual Leases', 'value': 'Scatter Plot'},
                                     {'label': 'Density', 'value': 'Heat Map'}
                                 ],
                         value='None',
-                        inputStyle={"margin-right": "5px"}
+                        labelStyle={'display': 'block', 'margin-top':'-5%'},
+                        inputStyle={"margin-right": "5%", 'margin-top':'6%'},
                     ),
                 ]
             ),
@@ -161,16 +160,11 @@ def develop_cards():
                 [
                     dbc.Col(map_controls_card),
                     dbc.Col(map_type_card),
-                ], className="mb-4"
-            ),
-            dbc.Row(
-                [
                     dbc.Col(counties_card),
                     dbc.Col(production_card),
                     dbc.Col(active_card),
-                ],
-                className="mb-4"
-            )
+                ], className="g-10",
+            ),
         ]
     )
 
@@ -221,18 +215,25 @@ app.layout = dbc.Container(
     [
         html.H1("Kansas Production Forecast"),
         html.Hr(),
+        develop_cards(),
         dbc.Row(
             [
-                dbc.Col(develop_cards(), md=4),
                 dbc.Col(
                     [
                         dcc.Graph(id="map", figure=draw_base_map(), config=map_config)
                     ],
-                md=8,
+                    className='mb-10',
+                ),
+                dbc.Col(
+                    [
+                        dcc.Graph(id="plot", figure=draw_base_map(), config=map_config)
+                    ],
+                    className='mb-10',
                 ),
             ],
+            style={'margin-top':'1%'},
             align="top", 
-            className="h-75",
+            className="g-10",
         ),
     ],
     fluid=True,
