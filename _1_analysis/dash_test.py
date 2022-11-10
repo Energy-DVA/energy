@@ -18,21 +18,24 @@ from shapely.geometry import Point
 def log(stuff):
     app.logger.info(stuff)
 
-def draw_base_map():
+def draw_base_map(draw_counties=True):
     fig = go.Figure()
     midpoint = (38.48470, -98.38020) # (Lat,Lon)
     # Add Counties shaders
-    fig.add_trace(
-        go.Choroplethmapbox(geojson=kansas_geojson, locations=kansas_state["GEOID"], z=kansas_state["LSAD"],
-                            marker_opacity=0.5, marker_line_width=0,
-                            colorscale="gray", zmin=0, zmax=9, showscale=False,
-                            text=kansas_state["NAME"],
-                            hovertemplate=
-                                        "<b>County</b><br>" +
-                                        "%{text}<br>" +
-                                        "<extra></extra>"
-        )
-    )
+    if draw_counties:
+        trace = go.Choroplethmapbox(geojson=kansas_geojson, locations=kansas_state["GEOID"], z=kansas_state["LSAD"],
+                                marker_opacity=0.5, marker_line_width=0,
+                                colorscale="gray", zmin=0, zmax=9, showscale=False,
+                                text=kansas_state["NAME"],
+                                hovertemplate=
+                                            "<b>County</b><br>" +
+                                            "%{text}<br>" +
+                                            "<extra></extra>"
+                )
+    else:
+        trace = go.Choroplethmapbox()
+    fig.add_trace(trace)
+    
     # Add counties borders
     fig.update_layout(
         mapbox={
@@ -65,10 +68,11 @@ def draw_base_map():
             'color': 'rgb(255,0,0)',
             'activecolor': 'rgb(100,0,200)',
         },
+        selectionrevision  = 'base',
+        uirevision = 'base',
     )
 
     fig.update_geos(fitbounds="locations", visible=False)
-    fig['layout']['uirevision'] = 'base'
     return fig
 
 def develop_cards():
@@ -209,6 +213,7 @@ map_config = {
                 'displayModeBar': True,
                 'displaylogo': False,
                 'scrollZoom': True,
+                'modeBarButtonsToAdd':['select2d','lasso2d']
             }
 
 app.layout = dbc.Container(
@@ -259,21 +264,28 @@ app.layout = dbc.Container(
 )
 def drawn_polygon(map_type, commodity, active, county, reset_view):
 
+    # Set flags if Reset View button pressed
+    if dash.callback_context.triggered_id == 'reset_view':
+        map_type = 'None'
+        reset_view = True
+    else:
+        reset_view = False
+
+    # Set flags to values
     if commodity == None:
         commodity = 'All'
     if active == None:
         active = 'All'
     if county == None:
         county = 'All'
-    if map_type == None:
-        map_type = 'None'
 
-    if dash.callback_context.triggered_id == 'reset_view':
-        map_type = 'None'
+    # If no map type is chosen, activate the counties Choropleth layer
+    if map_type == 'None':
+        reset_view = True
 
     # Draw base map
-    fig = draw_base_map()
-        
+    fig = draw_base_map(draw_counties=reset_view)
+
     # Retrieve Data
     s = select(
             [
@@ -359,7 +371,6 @@ def drawn_polygon(map_type, commodity, active, county, reset_view):
             )
     # else select None map
 
-
     fig.update_layout(legend=dict(
         yanchor="top",
         y=0.99,
@@ -367,10 +378,13 @@ def drawn_polygon(map_type, commodity, active, county, reset_view):
         x=0.01
     ))
 
-    fig['layout']['uirevision'] = 'base'
-    
     return fig,map_type
 
+@app.callback(
+    Output('plot', 'figure'),
+    Input('map', 'selectedData'))
+def update_selection(selection):
+    return draw_base_map()
 
 # @app.callback(
 #     Output('Coordinates', 'children'),
