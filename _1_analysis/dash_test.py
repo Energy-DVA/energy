@@ -6,41 +6,53 @@ import geopandas as gpd
 import geojson
 import json
 import plotly.graph_objects as go
-from dash import Input, Output, dcc, html
+from dash import Input, Output, ClientsideFunction, dcc, html
 import plotly.express as px
 from sqlalchemy import create_engine, MetaData, or_, and_
 from sqlalchemy import select, func 
 from db_schema import OIL_PROD_TABLE, GAS_PROD_TABLE, LEASE_TABLE, WELLS_TABLE, TOPS_TABLE
-from shapely.geometry import Point
+from shapely.geometry import Point, Polygon
 
 ###################--- Helper Functions ---############################
 
 def log(stuff):
     app.logger.info(stuff)
 
-def draw_base_map(draw_counties=True):
+def calc_zoom(min_lat,max_lat,min_lng,max_lng):
+    width_y = max_lat - min_lat
+    width_x = max_lng - min_lng
+    zoom_y = round(-1.446*np.log(width_y) + 7.2753,2)
+    zoom_x = round(-1.415*np.log(width_x) + 8.7068,2)
+    
+    return min(zoom_y,zoom_x)
+
+def draw_base_map(draw_counties=True, midpoint=(38.62470, -98.38020), zoom=6):
     fig = go.Figure()
-    midpoint = (38.48470, -98.38020) # (Lat,Lon)
     # Add Counties shaders
-    if draw_counties:
-        trace = go.Choroplethmapbox(geojson=kansas_geojson, locations=kansas_state["GEOID"], z=kansas_state["LSAD"],
-                                marker_opacity=0.5, marker_line_width=0,
-                                colorscale="gray", zmin=0, zmax=9, showscale=False,
-                                text=kansas_state["NAME"],
-                                hovertemplate=
-                                            "<b>County</b><br>" +
-                                            "%{text}<br>" +
-                                            "<extra></extra>"
-                )
-    else:
-        trace = go.Choroplethmapbox()
+    # if draw_counties:
+    #     trace = go.Choroplethmapbox(geojson=kansas_geojson, locations=kansas_state["GEOID"], z=kansas_state["LSAD"],
+    #                             marker_opacity=0.5, marker_line_width=0,
+    #                             colorscale="gray", zmin=0, zmax=9, showscale=False,
+    #                             text=kansas_state["NAME"],
+    #                             hovertemplate=
+    #                                         "<b>County</b><br>" +
+    #                                         "%{text}<br>" +
+    #                                         "<extra></extra>"
+    #             )
+    # else:
+    #     trace = go.Choroplethmapbox()
+    
+    trace = go.Choroplethmapbox()
     fig.add_trace(trace)
     
+    # Set UI Revision
+    revision = midpoint[0]+midpoint[1]+zoom
+
     # Add counties borders
     fig.update_layout(
         mapbox={
             "style": "open-street-map",
-            "zoom": 6,
+            "zoom": zoom,
             "layers": [
                 {
                     "source": kansas_geojson,
@@ -50,14 +62,11 @@ def draw_base_map(draw_counties=True):
                     "line": {"width": 1.5},
                 }
             ],
-            #"bounds" : {"west": -180, "east": -50, "south": 20, "north": 90},
             "center" : {"lat": midpoint[0], "lon": midpoint[1]}
         },
         margin={"l": 0, "r": 5, "t": 0, "b": 0},
         mapbox_style="open-street-map",#"white-bg",
         autosize = True,
-        #height = 600,
-        #dragmode='lasso',
         newselection=dict(line=dict(color="Crimson",
                                     width=2,
                                     dash="dash")),
@@ -68,8 +77,8 @@ def draw_base_map(draw_counties=True):
             'color': 'rgb(255,0,0)',
             'activecolor': 'rgb(100,0,200)',
         },
-        selectionrevision  = 'base',
-        uirevision = 'base',
+        selectionrevision  = revision,
+        uirevision = revision,
     )
 
     fig.update_geos(fitbounds="locations", visible=False)
@@ -133,10 +142,11 @@ def develop_cards():
                     dcc.RadioItems(
                         id="map_type",
                         options=[
+                                    {'label': 'Counties Only', 'value': 'Counties'},
                                     {'label': 'Individual Leases', 'value': 'Scatter Plot'},
                                     {'label': 'Density', 'value': 'Heat Map'}
                                 ],
-                        value='None',
+                        value='Counties',
                         labelStyle={'display': 'block', 'margin-top':'-5%'},
                         inputStyle={"margin-right": "5%", 'margin-top':'6%'},
                     ),
@@ -146,23 +156,23 @@ def develop_cards():
         body=True
     )
 
-    map_controls_card = dbc.Card(
-        [
-            dbc.CardHeader("Map Controls"),
-            dbc.CardBody(
-                [
-                    dbc.Button("Reset View", color="primary", className="mt-auto", id='reset_view'),
-                ]
-            ),
-        ], 
-        body=True
-    )
+    # map_controls_card = dbc.Card(
+    #     [
+    #         dbc.CardHeader("Map Controls"),
+    #         dbc.CardBody(
+    #             [
+    #                 dbc.Button("Reset View", color="primary", className="mt-auto", id='reset_view'),
+    #             ]
+    #         ),
+    #     ], 
+    #     body=True
+    # )
 
     controls = html.Div(
         [
             dbc.Row(
                 [
-                    dbc.Col(map_controls_card),
+                    #dbc.Col(map_controls_card),
                     dbc.Col(map_type_card),
                     dbc.Col(counties_card),
                     dbc.Col(production_card),
@@ -190,6 +200,7 @@ tops = meta.tables[TOPS_TABLE]
 
 # Setup required information
 kansas_state = gpd.read_file("Shapefiles/cb_2018_us_county_500k.shp")
+kansas_crs = kansas_state.crs
 kansas_state = kansas_state[kansas_state["STATEFP"]=='20'].reset_index(drop=True)
 kansas_state['LSAD'] = kansas_state['LSAD'].astype(int)
 with open('kansas_counties.geojson') as f:
@@ -225,13 +236,13 @@ app.layout = dbc.Container(
             [
                 dbc.Col(
                     [
-                        dcc.Graph(id="map", figure=draw_base_map(), config=map_config)
+                        dcc.Graph(id="map", figure=draw_base_map(draw_counties=False), config=map_config)
                     ],
                     className='mb-10',
                 ),
                 dbc.Col(
                     [
-                        dcc.Graph(id="plot", figure=draw_base_map(), config=map_config)
+                        dcc.Graph(id="plot", figure=draw_base_map(draw_counties=True), config=map_config)
                     ],
                     className='mb-10',
                 ),
@@ -249,29 +260,20 @@ app.layout = dbc.Container(
 ###################--- CALLBACKS ---##################################
 
 @app.callback(
-    [
         Output("map", "figure"),
-        Output("map_type", "value"),
-    ],
     [
         Input("map_type", "value"),
         Input("commodity", "value"),
         Input("activity", "value"),
         Input("county", "value"),
-        Input("reset_view", "n_clicks"),
     ],
-    prevent_initial_call=True
+    prevent_initial_call=False
 )
-def drawn_polygon(map_type, commodity, active, county, reset_view):
-
-    # Set flags if Reset View button pressed
-    if dash.callback_context.triggered_id == 'reset_view':
-        map_type = 'None'
-        reset_view = True
-    else:
-        reset_view = False
+def drawn_polygon(map_type, commodity, active, county):
 
     # Set flags to values
+    if map_type == None:
+        county = 'Counties'
     if commodity == None:
         commodity = 'All'
     if active == None:
@@ -280,8 +282,7 @@ def drawn_polygon(map_type, commodity, active, county, reset_view):
         county = 'All'
 
     # If no map type is chosen, activate the counties Choropleth layer
-    if map_type == 'None':
-        reset_view = True
+    reset_view = True if map_type == 'Counties' else False
 
     # Draw base map
     fig = draw_base_map(draw_counties=reset_view)
@@ -294,6 +295,7 @@ def drawn_polygon(map_type, commodity, active, county, reset_view):
                 lease.c.LONGITUDE,
                 lease.c.PRODUCES,
                 lease.c.YEAR_STOP,
+                lease.c.COUNTY,
             ]
     )
     if commodity != 'All':
@@ -310,14 +312,20 @@ def drawn_polygon(map_type, commodity, active, county, reset_view):
         s = s.where(lease.c.YEAR_STOP != '2022')
     # else do all
     
-    df = pd.read_sql(s, engine)
+    df = pd.read_sql(s, engine).dropna()
+    
     if map_type == "Heat Map":
         fig.add_trace(
             go.Densitymapbox(
                 lat=df['LATITUDE'],
                 lon=df['LONGITUDE'],
+                text=df['COUNTY'],
                 radius=2,
                 showscale=False,
+                hovertemplate=
+                    "<b>County</b><br>" +
+                    "%{text}<br>" +
+                    "<extra></extra>"
             )
         )
     elif map_type == "Scatter Plot":
@@ -332,17 +340,18 @@ def drawn_polygon(map_type, commodity, active, county, reset_view):
                     mode='markers',
                     marker=go.scattermapbox.Marker(
                         size=5,
-                        color='rgb(0,0,200)',
-                        opacity=0.25,
+                        color='rgba(0,0,200,0.75)',
+                        # opacity=0.66,
                     ),
                     text=df_oil['LEASE_KID'],
-                    customdata=kansas_state['NAME'],
+                    customdata=df_oil['COUNTY'],
                     showlegend=True,
                     legendgroup="scatter",
                     name="Oil Leases",
                     hovertemplate=
                         "<b>County</b><br>" +
                         "%{customdata}<br>" +
+                        "%{text}<br>" +
                         "<extra></extra>"
                 )
             )
@@ -355,36 +364,87 @@ def drawn_polygon(map_type, commodity, active, county, reset_view):
                     mode='markers',
                     marker=go.scattermapbox.Marker(
                         size=5,
-                        color='rgb(0,200,0)',
-                        opacity=0.25,
+                        color='rgba(0,200,0,0.75)',
+                        # opacity=0.66,
                     ),
                     text=df_gas['LEASE_KID'],
-                    customdata=kansas_state['NAME'],
+                    customdata=df_gas['COUNTY'],
                     showlegend=True,
                     legendgroup="scatter",
                     name="Gas Leases",
                     hovertemplate=
                         "<b>County</b><br>" +
                         "%{customdata}<br>" +
+                        "%{text}<br>" +
                         "<extra></extra>"
                 )
             )
-    # else select None map
+    # else Counties only and continue with basemap
 
-    fig.update_layout(legend=dict(
-        yanchor="top",
-        y=0.99,
-        xanchor="left",
-        x=0.01
-    ))
+    fig.update_layout(
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=0.01,
+            bgcolor="White",
+            bordercolor="Black",
+            borderwidth=1
+        ),
+        uirevision  = 'base',
+        selectionrevision  = 'base',
+    )
+    
+    return fig
 
-    return fig,map_type
 
 @app.callback(
     Output('plot', 'figure'),
-    Input('map', 'selectedData'))
+    Input('map', 'selectedData'),
+    prevent_initial_call=True
+)
 def update_selection(selection):
-    return draw_base_map()
+    
+
+    if 'lassoPoints' in selection.keys():
+        poly = np.array(selection['lassoPoints']['mapbox'])
+        gdf = gpd.GeoDataFrame(index=[0],geometry=[Polygon(poly)])
+        gdf.set_crs(kansas_crs, inplace=True)
+        midpoint = (gdf.centroid[0].y , gdf.centroid[0].x)
+    else: # Rect range selected
+        poly = np.array(selection['range']['mapbox'])
+        midpoint = (np.mean(poly[:,1]) , np.mean(poly[:,0]))
+
+    zoom = calc_zoom(np.min(poly[:,1]),np.max(poly[:,1]),np.min(poly[:,0]),np.max(poly[:,0]))
+    log(midpoint)
+    log(zoom)
+    fig = draw_base_map(midpoint=midpoint, zoom=zoom)
+    return fig
+
+
+
+# @app.callback(
+#     Output("plot", "figure"), 
+#     [
+#         Input("commodity", "value"),
+#         Input("county", "value"),
+#     ]
+# )
+# def display_time_series(commodity, county):
+#     if county == None or county == 'All' or commodity == 'All':
+#         return px.line()
+#     else:
+#         table = oil_prod if commodity == 'Oil' else gas_prod
+#         # Retrieve Data
+#         s = select(
+#                 [
+#                     table.c.DATE,
+#                     table.c.PRODUCTION
+#                 ]
+#         )
+#         df = pd.read_sql(s, engine).dropna()
+#         fig = px.line(df, x='DATE', y='PRODUCTION')
+#         return fig
 
 # @app.callback(
 #     Output('Coordinates', 'children'),
