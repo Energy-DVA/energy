@@ -6,7 +6,7 @@ import geopandas as gpd
 import geojson
 import json
 import plotly.graph_objects as go
-from dash import Input, Output, ClientsideFunction, dcc, html
+from dash import Input, Output, State, ClientsideFunction, dcc, html
 import plotly.express as px
 from sqlalchemy import create_engine, MetaData, or_, and_
 from sqlalchemy import select, func 
@@ -65,7 +65,6 @@ def draw_base_map(draw_counties=True, midpoint=(38.62470, -98.38020), zoom=6):
             "center" : {"lat": midpoint[0], "lon": midpoint[1]}
         },
         margin={"l": 0, "r": 5, "t": 0, "b": 0},
-        mapbox_style="open-street-map",#"white-bg",
         autosize = True,
         newselection=dict(line=dict(color="Crimson",
                                     width=2,
@@ -91,10 +90,12 @@ def develop_cards():
             dbc.CardHeader("Production Type"),
             dbc.CardBody(
                 [
-                    dcc.Dropdown(
+                    dcc.RadioItems(
                         id="commodity",
                         options=["All","Oil","Gas"],
                         value="All",
+                        labelStyle={'display': 'block', 'margin-top':'-5%'},
+                        inputStyle={"margin-right": "5%", 'margin-top':'6%'},
                     ),
                 ]
             ),
@@ -104,16 +105,38 @@ def develop_cards():
 
     active_card = dbc.Card(
         [
-            dbc.CardHeader("Activity"),
+            dbc.CardHeader("Select Years of Activity"),
             dbc.CardBody(
                 [
-                    dcc.Dropdown(
-                        id="activity",
-                        options=["All","Active","Inactive"],
-                        value="All",
+                    dbc.Row(
+                        [
+                            dbc.Col(
+                                [
+                                    'Year from:',
+                                    dbc.Input(type='number', min=1930, max=2022, id='activity-from', size='sm', value=1991, debounce=True),
+                                ]
+                            ),
+                            dbc.Col(
+                                [
+                                    'Year to:',
+                                    dbc.Input(type='number', min=1930, max=2022, id='activity-to', size='sm', value=2022, debounce=True),
+                                ]
+                            ),
+                        ]
+                    ),
+                    html.Br(),
+                    dcc.RangeSlider(
+                        1930,
+                        2022,
+                        step=1,
+                        id='year-slider',
+                        value=[1991,2022],
+                        marks={str(year): str(year) for year in range(1930,2022,15)},
+                        tooltip={"placement": "bottom", "always_visible": True},
+                        pushable=5,
                     ),
                 ]
-            ),
+            )
         ],
         body=True
     )
@@ -208,7 +231,7 @@ with open('kansas_counties.geojson') as f:
 
 # Setup app config, layout, and tokens
 app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
-mapbox_access_token = "pk.eyJ1IjoiZ2VldGFraW5nbGUiLCJhIjoiY2w5dmxxc3JmMHJ6azNva2JzOHNoMGhxayJ9.qEl0L0gXzDHVYSkF1uvoSg"
+#mapbox_access_token = "pk.eyJ1IjoiZ2VldGFraW5nbGUiLCJhIjoiY2w5dmxxc3JmMHJ6azNva2JzOHNoMGhxayJ9.qEl0L0gXzDHVYSkF1uvoSg"
 s = select(
         [
             func.distinct(lease.c.COUNTY)
@@ -260,24 +283,85 @@ app.layout = dbc.Container(
 ###################--- CALLBACKS ---##################################
 
 @app.callback(
-        Output("map", "figure"),
-    [
-        Input("map_type", "value"),
-        Input("commodity", "value"),
-        Input("activity", "value"),
-        Input("county", "value"),
-    ],
+    Output("year-slider", "value"),
+    Output("activity-from", "value"),
+    Output("activity-to", "value"),
+    Input("year-slider", "value"),
+    Input("activity-from", "value"),
+    Input("activity-to", "value"),
     prevent_initial_call=False
 )
-def drawn_polygon(map_type, commodity, active, county):
+def update_slider(slider, fro, to):
+    trigger_id = dash.callback_context.triggered_id
+    year_start = fro if trigger_id == "activity-from" else slider[0]
+    year_end = to if trigger_id == "activity-to" else slider[1]
+    slider_value = slider if trigger_id == "year-slider" else [year_start, year_end]
 
+    # Adjust for inputs error (when year_start > year_end and vice versa)
+    if (trigger_id == "activity-from" and year_start > year_end):
+        year_end = year_start + 5
+    elif (trigger_id == "activity-to" and year_start > year_end):
+        year_start = year_end - 5
+    return slider_value, year_start, year_end
+
+
+
+
+# @app.callback(
+#     Output("plot", "figure"),
+#     Input("county", "value")
+# )
+# def draw_animation(county):
+    # fig = draw_base_map(draw_counties=True)
+
+    # s = select(
+    #         [
+    #             lease.c.LEASE_KID,
+    #             lease.c.LATITUDE,
+    #             lease.c.LONGITUDE,
+    #             lease.c.YEAR_START,
+    #             lease.c.YEAR_STOP,
+    #         ]
+    # )
+
+    # # Read data from SQL
+    # df = pd.read_sql(s, engine).dropna()
+
+    # fig.add_trace(
+    #     px.scatter_mapbox(df,
+    #         lat="LATITUDE",
+    #         lon="LONGITUDE",
+    #         animation_frame = 'Date',
+    #         animation_group = 'LEASE_KID', 
+    #         color="Confirmed",
+    #         size="Confirmed",
+    #         color_continuous_scale=px.colors.cyclical.IceFire, 
+    #         size_max=70,
+    #         zoom=0.75,
+    #         hover_name='Country', 
+    #         hover_data = ['Confirmed', 'Deaths', 'Recovery'], 
+    #         title = 'Visualizing spread of COVID from 22/1/2020 to 17/6/2020')
+    # )
+    # return fig
+
+
+@app.callback(
+    Output("map", "figure"),
+    Input("map_type", "value"),
+    Input("commodity", "value"),
+    Input("year-slider", "value"),
+    Input("county", "value"),
+    prevent_initial_call=False
+)
+def drawn_polygon(map_type, commodity, activity, county):
+    
     # Set flags to values
     if map_type == None:
         county = 'Counties'
     if commodity == None:
         commodity = 'All'
-    if active == None:
-        active = 'All'
+    if activity == None:
+        activity = [1930,2022]
     if county == None:
         county = 'All'
 
@@ -294,6 +378,7 @@ def drawn_polygon(map_type, commodity, active, county):
                 lease.c.LATITUDE,
                 lease.c.LONGITUDE,
                 lease.c.PRODUCES,
+                lease.c.YEAR_START,
                 lease.c.YEAR_STOP,
                 lease.c.COUNTY,
             ]
@@ -306,12 +391,20 @@ def drawn_polygon(map_type, commodity, active, county):
         s = s.where(lease.c.COUNTY == county)
     # else select all
 
-    if active == 'Active':
-        s = s.where(lease.c.YEAR_STOP == '2022')
-    elif active == 'Inactive':
-        s = s.where(lease.c.YEAR_STOP != '2022')
-    # else do all
+
+    # Filter on chosen years where leases are active using complement of the following two conditions
+    # 
+    # 1) Selection years are after the lease stops producing
+    #               activity[0] |--------| activity[1]
+    # YEAR_START |-------| YEAR_STOP
+    # 
+    # 2) Selection years are before the lease starts producing
+    # activity[0] |--------| activity[1]
+    #                     YEAR_START |-------| YEAR_STOP
+    #     
+    s = s.where(and_(lease.c.YEAR_STOP >= activity[0]), lease.c.YEAR_START <= activity[1])
     
+    # Read data from SQL
     df = pd.read_sql(s, engine).dropna()
     
     if map_type == "Heat Map":
@@ -397,29 +490,20 @@ def drawn_polygon(map_type, commodity, active, county):
     
     return fig
 
+#     if 'lassoPoints' in selection.keys():
+#         poly = np.array(selection['lassoPoints']['mapbox'])
+#         gdf = gpd.GeoDataFrame(index=[0],geometry=[Polygon(poly)])
+#         gdf.set_crs(kansas_crs, inplace=True)
+#         midpoint = (gdf.centroid[0].y , gdf.centroid[0].x)
+#     else: # Rect range selected
+#         poly = np.array(selection['range']['mapbox'])
+#         midpoint = (np.mean(poly[:,1]) , np.mean(poly[:,0]))
 
-@app.callback(
-    Output('plot', 'figure'),
-    Input('map', 'selectedData'),
-    prevent_initial_call=True
-)
-def update_selection(selection):
-    
-
-    if 'lassoPoints' in selection.keys():
-        poly = np.array(selection['lassoPoints']['mapbox'])
-        gdf = gpd.GeoDataFrame(index=[0],geometry=[Polygon(poly)])
-        gdf.set_crs(kansas_crs, inplace=True)
-        midpoint = (gdf.centroid[0].y , gdf.centroid[0].x)
-    else: # Rect range selected
-        poly = np.array(selection['range']['mapbox'])
-        midpoint = (np.mean(poly[:,1]) , np.mean(poly[:,0]))
-
-    zoom = calc_zoom(np.min(poly[:,1]),np.max(poly[:,1]),np.min(poly[:,0]),np.max(poly[:,0]))
-    log(midpoint)
-    log(zoom)
-    fig = draw_base_map(midpoint=midpoint, zoom=zoom)
-    return fig
+#     zoom = calc_zoom(np.min(poly[:,1]),np.max(poly[:,1]),np.min(poly[:,0]),np.max(poly[:,0]))
+#     log(midpoint)
+#     log(zoom)
+#     fig = draw_base_map(midpoint=midpoint, zoom=zoom)
+#     return fig
 
 
 
