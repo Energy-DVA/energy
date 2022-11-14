@@ -12,7 +12,7 @@ production_card = dbc.Card(
         dbc.CardHeader("Production Type"),
         dbc.CardBody(
             [
-                dcc.RadioItems(
+                dcc.Checklist(
                     id="commodity",
                     options=["Oil", "Gas"],
                     value=["Oil", "Gas"],
@@ -87,7 +87,8 @@ counties_card = dbc.Card(
                 dcc.Dropdown(
                     id="county",
                     options=["All"] + COUNTIES,
-                    value="All",
+                    value=None,
+                    multi=True,
                 ),
             ]
         ),
@@ -147,7 +148,7 @@ map_config = {
 layout = dbc.Container(
     [
         dbc.Row(
-            [
+            html.Div([
                 dbc.Col(
                     [
                         dbc.Row(
@@ -176,7 +177,7 @@ layout = dbc.Container(
                     ],
                     width=8,
                 ),
-            ]
+            ])
         ),
         dbc.Row(
             [
