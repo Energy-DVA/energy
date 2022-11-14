@@ -14,7 +14,7 @@ from components.base_map import draw_base_map
     Input("year-slider", "value"),
     Input("county", "value"),
     Input("operators", "value"),
-    prevent_initial_call=False
+    prevent_initial_call=False,
 )
 def update_map(map_type, commodity, activity, county, operators):
 
@@ -31,8 +31,10 @@ def update_map(map_type, commodity, activity, county, operators):
         dm.L_YEAR_STOP,
         dm.L_COUNTY,
     ]
-
-    df = dm.get_lease_info(cols, None, county, operators, commodity, activity).dropna()
+    commodity_l = [x.upper() for x in commodity]
+    df = dm.get_lease_info(
+        cols, None, county, operators, commodity_l, activity
+    ).dropna()
 
     if map_type == "Heat Map":
         fig.add_trace(
@@ -48,13 +50,14 @@ def update_map(map_type, commodity, activity, county, operators):
     elif map_type == "Scatter Plot":
         df_oil = df[df[dm.L_PRODUCES] == dm.L_PRODUCES_OIL]
         df_gas = df[df[dm.L_PRODUCES] == dm.L_PRODUCES_GAS]
+        print(df_oil)
 
-        if commodity == "All" or commodity == "Oil":
+        if "Oil" in commodity:
             fig.add_trace(
                 scatter_commodity(df_oil, dm, "rgba(0,200,0,0.75)", "Oil Leases")
             )
 
-        if commodity == "All" or commodity == "Gas":
+        if "Gas" in commodity:
             fig.add_trace(
                 scatter_commodity(df_gas, dm, "rgba(200,0,0,0.75)", "Gas Leases")
             )
