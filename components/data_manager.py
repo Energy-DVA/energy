@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine, select, func, MetaData, and_
-from typing import List, Optional
+from typing import List, Tuple, Optional
 import pandas as pd
 
 
@@ -18,6 +18,9 @@ class DataManager:
     L_LATITUDE = "LATITUDE"
     L_LONGITUDE = "LONGITUDE"
     L_PRODUCES = "PRODUCES"
+    # -- Typical PRODUCES Values
+    L_PRODUCES_OIL = "OIL"
+    L_PRODUCES_GAS = "GAS"
     L_YEAR_START = "YEAR_START"
     L_YEAR_STOP = "YEAR_STOP"
     # -- Production tables (same for both oil and gas)
@@ -45,7 +48,8 @@ class DataManager:
         lease_ids: Optional[List[str]],
         counties: Optional[List[str]],
         operators: Optional[List[str]],
-        years_start: Optional[List[int]],
+        produces: Optional[List[str]],
+        years_range: Optional[Tuple[int, int]],
     ):
         conditions = []
         # -- Add lease ids
@@ -57,9 +61,17 @@ class DataManager:
         # -- Add operators
         if operators is not None:
             conditions.append(self.lease.c[self.L_OPERATOR].in_(operators))
+        # -- Add produces
+        if produces is not None:
+            conditions.append(self.lease.c[self.L_PRODUCES].in_(produces))
         # -- Add years start
-        if years_start is not None:
-            conditions.append(self.lease.c[self.L_YEAR_START].in_(years_start))
+        if years_range is not None:
+            conditions.append(
+                and_(
+                    self.lease.c[self.L_YEAR_START] >= years_range[0],
+                    self.lease.c[self.L_YEAR_STOP] <= years_range[1],
+                )
+            )
 
         return conditions
 
@@ -69,6 +81,7 @@ class DataManager:
         lease_ids: Optional[List[str]],
         counties: Optional[List[str]],
         operators: Optional[List[str]],
+        produces: Optional[List[str]],
         years_start: Optional[List[int]],
     ) -> pd.DataFrame:
         """Get lease info for a list of lease ids, counties and operators"""
@@ -76,11 +89,11 @@ class DataManager:
         if cols is None:
             s_cols = self.lease
         else:
-            s_cols = [self.lease[col] for col in cols]
+            s_cols = [self.lease.c[col] for col in cols]
 
         # -- Create the conditions
         conditions = self._create_conditions(
-            lease_ids, counties, operators, years_start
+            lease_ids, counties, operators, produces, years_start
         )
 
         s = select(s_cols).where(and_(*conditions))

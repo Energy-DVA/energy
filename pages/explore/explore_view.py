@@ -14,8 +14,8 @@ production_card = dbc.Card(
             [
                 dcc.RadioItems(
                     id="commodity",
-                    options=["All", "Oil", "Gas"],
-                    value="All",
+                    options=["Oil", "Gas"],
+                    value=["Oil", "Gas"],
                     labelStyle={"display": "block", "margin-top": "-5%"},
                     inputStyle={"margin-right": "5%", "margin-top": "6%"},
                 ),
@@ -95,6 +95,23 @@ counties_card = dbc.Card(
     body=True,
 )
 
+operators_card = dbc.Card(
+    [
+        dbc.CardHeader("Operators"),
+        dbc.CardBody(
+            [
+                dcc.Dropdown(
+                    id="operators",
+                    options=["X", "Y", "Z"],
+                    value=None,
+                    multi=True,
+                ),
+            ]
+        ),
+    ],
+    body=True,
+)
+
 map_type_card = dbc.Card(
     [
         dbc.CardHeader("Lease Visualizations"),
@@ -117,7 +134,7 @@ map_type_card = dbc.Card(
     body=True,
 )
 
-# Define Map Configuration 
+# Define Map Configuration
 map_config = {
     "displayModeBar": True,
     "displaylogo": False,
@@ -139,7 +156,12 @@ layout = dbc.Container(
                                 dbc.Col(map_type_card),
                             ]
                         ),
-                        dbc.Row(counties_card),
+                        dbc.Row(
+                            [
+                                dbc.Col(counties_card),
+                                dbc.Col(operators_card),
+                            ]
+                        ),
                         dbc.Row(active_card),
                     ],
                     width=4,
@@ -158,11 +180,7 @@ layout = dbc.Container(
         ),
         dbc.Row(
             [
-                dcc.Graph(
-                    id="map",
-                    figure=draw_base_map(),
-                    config=map_config,
-                ),
+                dcc.Graph(id="plot"),
             ],
         ),
     ],

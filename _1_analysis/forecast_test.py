@@ -1,4 +1,4 @@
-from src.pages.forecast.data_manager import DataManager
+from components.data_manager import DataManager
 #%% Create data manager
 db_path = "/data/kansas_oil_gas.db"
 db_type = "sqlite"
