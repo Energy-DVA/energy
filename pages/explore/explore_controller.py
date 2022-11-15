@@ -24,6 +24,10 @@ from utils.functions import log
 )
 def update_map(map_type, commodity, activity, county, operators):
 
+    # Handle error
+    if len(commodity) == 0:
+        return go.Figure()
+    
     # Set flags
     if county == [] or county == ["All"]:
         county = None
@@ -95,11 +99,13 @@ def update_map(map_type, commodity, activity, county, operators):
 @app.callback(
     Output("plot", "figure"),
     Input("commodity", "value"),
+    Input("year-slider", "value"),
     Input("county", "value"),
+    Input("operators", "value"),
     Input("map", "selectedData"),
     prevent_initial_call=False,
 )
-def update_plot(commodity, county, selection):
+def update_plot(commodity, activity, county, operators, selection):
 
     # Handle error
     if len(commodity) == 0:
@@ -107,7 +113,10 @@ def update_plot(commodity, county, selection):
 
     # Set flags
     if county == [] or county == ["All"]:
+        county = None
         lease_ids = None
+    if operators == [] or operators == ["All"]:
+        operators = None
 
     # Check if map selection triggered callback
     # If yes, retrieve selection leases
@@ -117,6 +126,23 @@ def update_plot(commodity, county, selection):
             lease_ids = [int(pt["text"]) for pt in selection["points"]]
         else:
             lease_ids = None
+    else:
+        cols = [
+            dm.L_LEASE_ID,
+            dm.L_LATITUDE,
+            dm.L_LONGITUDE,
+            dm.L_PRODUCES,
+            dm.L_YEAR_START,
+            dm.L_YEAR_STOP,
+            dm.L_COUNTY,
+        ]
+        commodity_l = [x.upper() for x in commodity]
+        df = dm.get_lease_info(
+            cols, None, county, operators, commodity_l, activity
+        ).dropna()
+        lease_ids = list(df[dm.L_LEASE_ID])
+    
+    log(lease_ids)
 
     subplot_titles = [None, None]
     for commo in commodity:
