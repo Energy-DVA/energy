@@ -32,7 +32,7 @@ def draw_base_map(midpoint=DEFAULT_MIDPOINT, zoom=DEFAULT_ZOOM):
             ],
             "center": {"lat": midpoint[0], "lon": midpoint[1]},
         },
-        margin={"l": 0, "r": 5, "t": 0, "b": 0},
+        margin={"l": 0, "r": 0, "t": 0, "b": 0},
         autosize=True,
         newselection=dict(line=dict(color="Crimson", width=2, dash="dash")),
         modebar={
