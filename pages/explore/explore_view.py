@@ -1,8 +1,6 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 
-from app import app
-
 from utils.constants import COUNTIES
 from components.base_map import draw_base_map
 
@@ -145,49 +143,34 @@ map_config = {
     "modeBarButtonsToAdd": ["select2d", "lasso2d"],
 }
 
+# Define sidebar layout
+sidebar = [
+    dbc.Row(
+        [
+            dbc.Col(production_card),
+            dbc.Col(map_type_card),
+        ]
+    ),
+    dbc.Row(
+        [
+            dbc.Col(counties_card),
+            dbc.Col(operators_card),
+        ]
+    ),
+    dbc.Row(active_card),
+]
 
-# Define Layout
-layout = dbc.Container(
-    [
-        dbc.Row(
-            html.Div(
-                [
-                    dbc.Col(
-                        [
-                            dbc.Row(
-                                [
-                                    dbc.Col(production_card),
-                                    dbc.Col(map_type_card),
-                                ]
-                            ),
-                            dbc.Row(
-                                [
-                                    dbc.Col(counties_card),
-                                    dbc.Col(operators_card),
-                                ]
-                            ),
-                            dbc.Row(active_card),
-                        ],
-                        width=4,
-                    ),
-                    dbc.Col(
-                        [
-                            dcc.Graph(
-                                id="map",
-                                figure=draw_base_map(),
-                                config=map_config,
-                            )
-                        ],
-                        width=8,
-                    ),
-                ]
-            )
-        ),
-        dbc.Row(
-            [
-                dcc.Graph(id="plot"),
-            ],
-        ),
-    ],
-    fluid=True,
-)
+
+# Define page-content Layout
+layout = [
+    dcc.Graph(
+        id="map",
+        figure=draw_base_map(),
+        config=map_config,
+    ),
+    dcc.Graph(
+        id="plot",
+        figure=draw_base_map(),
+        config=map_config,
+    ),
+]
