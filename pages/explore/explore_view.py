@@ -87,7 +87,7 @@ counties_card = dbc.Card(
                 dcc.Dropdown(
                     id="county",
                     options=["All"] + COUNTIES,
-                    value=None,
+                    value=["All"],
                     multi=True,
                 ),
             ]
@@ -103,8 +103,8 @@ operators_card = dbc.Card(
             [
                 dcc.Dropdown(
                     id="operators",
-                    options=["X", "Y", "Z"],
-                    value=None,
+                    options=["All","X", "Y", "Z"],
+                    value=["All"],
                     multi=True,
                 ),
             ]

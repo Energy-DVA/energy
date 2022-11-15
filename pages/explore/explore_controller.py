@@ -6,6 +6,21 @@ from utils.functions import scatter_commodity
 from pages.explore.explore_model import dm
 from components.base_map import draw_base_map
 
+# @app.callback(
+#     Output("county", "value"),
+#     Output("operators", "value"),
+#     Input("county", "value"),
+#     Input("operators", "value"),
+#     prevent_initial_call=False,
+# )
+# def filter_based_on_input(county, operators):
+#     # This function filters the inputs and sets the same outputs
+#     # If input has "All" and any other value, it removes "All"
+#     # If "All" is added, all other inputs are removed
+
+#     if len("county") > 1 and "All" in county:
+#         county = ["All"]
+
 
 @app.callback(
     Output("map", "figure"),
@@ -17,6 +32,13 @@ from components.base_map import draw_base_map
     prevent_initial_call=False,
 )
 def update_map(map_type, commodity, activity, county, operators):
+
+    # Set flags
+    if county == [] or county == ["All"]:
+        county = None
+
+    if operators == [] or operators == ["All"]:
+        operators = None
 
     # Draw base map
     fig = draw_base_map()
