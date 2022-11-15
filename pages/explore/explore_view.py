@@ -4,7 +4,13 @@ import plotly.graph_objects as go
 
 from utils.constants import COUNTIES
 from components.base_map import draw_base_map
-from components.cards import production_card, active_card, counties_card, operators_card, map_type_card
+from components.cards import (
+    production_card,
+    active_card,
+    counties_card,
+    operators_card,
+    map_type_card,
+)
 
 # Define Map Configuration
 map_config = {

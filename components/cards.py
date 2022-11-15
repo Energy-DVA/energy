@@ -13,8 +13,8 @@ production_card = dbc.Card(
                     id="commodity",
                     options=["Oil", "Gas"],
                     value=["Oil", "Gas"],
-                    labelClassName='card-labels',
-                    inputClassName='card-inputs',
+                    labelClassName="card-labels",
+                    inputClassName="card-inputs",
                 ),
             ]
         ),
@@ -125,8 +125,8 @@ map_type_card = dbc.Card(
                         {"label": "Density", "value": "Heat Map"},
                     ],
                     value="Counties",
-                    labelClassName='card-labels',
-                    inputClassName='card-inputs',
+                    labelClassName="card-labels",
+                    inputClassName="card-inputs",
                 ),
             ]
         ),

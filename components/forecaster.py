@@ -75,9 +75,7 @@ class Forecaster:
             suppress_warnings=self.SUPPRESS_WARNINGS,
         )
 
-    def predict(
-        self, n_periods: int, X: Optional[pd.DataFrame] = None
-    ) -> pd.DataFrame:
+    def predict(self, n_periods: int, X: Optional[pd.DataFrame] = None) -> pd.DataFrame:
         self.n_periods = n_periods
 
         if self.X is not None and X is None:

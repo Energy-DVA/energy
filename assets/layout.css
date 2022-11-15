@@ -12,4 +12,14 @@
     margin-left: 33vw;
 }
 
+#website-title {
+    text-align: right;
+}
 
+#header {
+    border: 1px black solid;
+}
+
+#page-body {
+    padding-top : 5vh ;
+}

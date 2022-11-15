@@ -6,7 +6,7 @@ from layout.tabs.tabs import tabs
 SIDEBAR_WIDTH = 4
 
 
-title = html.H1("Kansas Production Forecast")
+title = html.H1("Kansas Production Forecast", id='website-title')
 sidebar = html.Div(id="sidebar")
 content = html.Div(id="page-content")
 
@@ -16,15 +16,20 @@ content = html.Div(id="page-content")
 
 layout = html.Div(
     [
-        title,
-        html.Hr(),
-        tabs,
+        dbc.Row(
+            [
+                dbc.Col(title, width='auto'),
+                dbc.Col(tabs),
+            ],
+            id='header'
+        ),
         dbc.Container(
             [
-                dbc.Col(sidebar, className='sidebar-layout'),
-                dbc.Col(content, className='content-layout'),
+                dbc.Col(sidebar, className="sidebar-layout"),
+                dbc.Col(content, className="content-layout"),
             ],
-            fluid=True
+            id='page-body',
+            fluid=True,
         ),
     ]
 )
