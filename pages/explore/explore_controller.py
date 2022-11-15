@@ -2,11 +2,15 @@ from app import app
 from dash import callback_context
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import pandas as pd
 from utils.constants import YEAR_START, YEAR_END
 from utils.functions import scatter_commodity
 from pages.explore.explore_model import dm
 from components.base_map import draw_base_map
 
+
+from utils.functions import log
 
 @app.callback(
     Output("map", "figure"),
@@ -85,6 +89,57 @@ def update_map(map_type, commodity, activity, county, operators):
     )
 
     return fig
+
+
+@app.callback(
+    Output("plot", "figure"),
+    Input("commodity", "value"),
+    Input("county", "value"),
+    Input("map", "selectedData"),
+    prevent_initial_call=False,
+)
+def update_plot(commodity, county, selection):
+    
+    # Handle error
+    if len(commodity) == 0:
+        return go.Figure()
+    
+    # Set flags
+    if county == [] or county == ["All"]:
+        lease_ids = None
+    
+    # Check if map selection triggered callback
+    # If yes, retrieve selection leases
+    # If selection is empty, do nothing and return original figure
+    if callback_context.triggered_id == 'map':
+        if len(selection['points']) > 0:
+            lease_ids = [int(pt['text']) for pt in selection['points']]
+        else:
+            lease_ids = None
+    
+    
+    subplot_titles = [None,None]
+    for commo in commodity:
+        subplot_titles.append(f"Number of Wells of Selected {commo} Leases")
+    
+    # Develop plot
+    fig = make_subplots(rows=2, cols=max(1,len(commodity)),
+                        shared_xaxes=True,
+                        vertical_spacing=0.1,
+                        column_titles=[f"Monthly Production of Selected {commo} Leases" for commo in commodity],
+                        subplot_titles=subplot_titles)
+    
+    for i, commo in enumerate(commodity):
+        # Retrieve Data
+        df = dm.get_production_from_ids(commo.lower(), lease_ids, get_rate=False)
+        # Plot the two traces
+        fig.add_trace(go.Scatter(x=df.index, y=df['PRODUCTION']), row=1, col=i+1)
+        fig.add_trace(go.Scatter(x=df.index, y=df['WELLS']),row=2, col=i+1)
+
+    fig.update_layout(showlegend=False, title_text="Selected Data Production")
+
+    return fig
+
 
 
 @app.callback(

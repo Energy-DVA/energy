@@ -1,5 +1,6 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
+import plotly.graph_objects as go
 
 from utils.constants import COUNTIES
 from components.base_map import draw_base_map
@@ -33,14 +34,21 @@ sidebar = [
 
 # Define page-content Layout
 layout = [
-    dcc.Graph(
-        id="map",
-        figure=draw_base_map(),
-        config=map_config,
+    dcc.Loading(
+        dcc.Graph(
+            id="map",
+            figure=draw_base_map(),
+            config=map_config,
+        ),
+        id="loading-1",
+        type="default",
     ),
-    dcc.Graph(
-        id="plot",
-        figure=draw_base_map(),
-        config=map_config,
+    dcc.Loading(
+        dcc.Graph(
+            id="plot",
+            figure=go.Figure(),
+        ),
+        id="loading-1",
+        type="default",
     ),
 ]
