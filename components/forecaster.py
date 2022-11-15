@@ -76,15 +76,16 @@ class Forecaster:
         )
 
     def predict(
-        self, n_periods: int, x_var: Optional[pd.DataFrame] = None
+        self, n_periods: int, X: Optional[pd.DataFrame] = None
     ) -> pd.DataFrame:
         self.n_periods = n_periods
 
-        if self.X is not None and x_var is None:
+        if self.X is not None and X is None:
             raise ValueError(
                 "The exogenous variables must be provided to make the forecast."
             )
 
+        x_var = X.copy() if X is not None else None
         forecast, confint = self.model.predict(
             n_periods=n_periods, X=x_var, return_conf_int=True, alpha=self.ALPHA
         )
@@ -99,7 +100,14 @@ class Forecaster:
         )
 
         if x_var is not None:
-            df_forecast[self.RES_X_VAR] = x_var
+            x_var.index = forecast.index
+            # Rename x_var columns
+            x_var.rename(
+                columns={col: self.RES_X_VAR + "_" + str(col) for col in x_var.columns},
+                inplace=True,
+            )
+            # Concat x_var in results data frame
+            df_forecast = pd.concat([df_forecast, x_var], axis=1)
 
         return df_forecast
 
