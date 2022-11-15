@@ -22,7 +22,7 @@ def scatter_commodity(df: pd.DataFrame, dm: DataManager, color: str, title: str)
         text=df[dm.L_LEASE_ID],
         customdata=df[dm.L_COUNTY],
         showlegend=True,
-        legendgroup="scatter"+title,
+        legendgroup="scatter" + title,
         name=title,
         hovertemplate="<b>County</b><br>"
         + "%{customdata}<br>"

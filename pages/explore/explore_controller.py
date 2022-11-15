@@ -1,25 +1,11 @@
 from app import app
+from dash import callback_context
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 from utils.constants import YEAR_START, YEAR_END
 from utils.functions import scatter_commodity
 from pages.explore.explore_model import dm
 from components.base_map import draw_base_map
-
-# @app.callback(
-#     Output("county", "value"),
-#     Output("operators", "value"),
-#     Input("county", "value"),
-#     Input("operators", "value"),
-#     prevent_initial_call=False,
-# )
-# def filter_based_on_input(county, operators):
-#     # This function filters the inputs and sets the same outputs
-#     # If input has "All" and any other value, it removes "All"
-#     # If "All" is added, all other inputs are removed
-
-#     if len("county") > 1 and "All" in county:
-#         county = ["All"]
 
 
 @app.callback(
@@ -72,7 +58,6 @@ def update_map(map_type, commodity, activity, county, operators):
     elif map_type == "Scatter Plot":
         df_oil = df[df[dm.L_PRODUCES] == dm.L_PRODUCES_OIL]
         df_gas = df[df[dm.L_PRODUCES] == dm.L_PRODUCES_GAS]
-        print(df_oil)
 
         if "Oil" in commodity:
             fig.add_trace(
@@ -100,3 +85,53 @@ def update_map(map_type, commodity, activity, county, operators):
     )
 
     return fig
+
+
+@app.callback(
+    Output("year-slider", "value"),
+    Output("activity-from", "value"),
+    Output("activity-to", "value"),
+    Input("year-slider", "value"),
+    Input("activity-from", "value"),
+    Input("activity-to", "value"),
+    prevent_initial_call=False,
+)
+def update_slider_values(slider, fro, to):
+    trigger_id = callback_context.triggered_id
+    year_start = fro if trigger_id == "activity-from" else slider[0]
+    year_end = to if trigger_id == "activity-to" else slider[1]
+    slider_value = slider if trigger_id == "year-slider" else [year_start, year_end]
+
+    # Adjust for inputs error (when year_start > year_end and vice versa)
+    if trigger_id == "activity-from" and year_start > year_end:
+        year_end = year_start + 5
+    elif trigger_id == "activity-to" and year_start > year_end:
+        year_start = year_end - 5
+    return slider_value, year_start, year_end
+
+
+@app.callback(
+    Output("county", "value"),
+    Output("operators", "value"),
+    Input("county", "value"),
+    Input("operators", "value"),
+    prevent_initial_call=False,
+)
+def filter_based_on_input(county, operators):
+    # This function filters the inputs and sets the same outputs
+    # If input has "All" and any other value, it removes "All"
+    # If "All" is added, all other inputs are removed
+
+    if len("county") > 1 and "All" in county:
+        if county[-1] == "All":  # If All was selected at the end
+            county = ["All"]
+        else:  # Remove All from list
+            county = [i for i in county if i != "All"]
+
+    if len("operators") > 1 and "All" in operators:
+        if operators[-1] == "All":  # If All was selected at the end
+            operators = ["All"]
+        else:  # Remove All from list
+            operators = [i for i in operators if i != "All"]
+
+    return county, operators

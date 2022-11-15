@@ -89,6 +89,7 @@ counties_card = dbc.Card(
                     options=["All"] + COUNTIES,
                     value=["All"],
                     multi=True,
+                    searchable=True,
                 ),
             ]
         ),
@@ -103,9 +104,10 @@ operators_card = dbc.Card(
             [
                 dcc.Dropdown(
                     id="operators",
-                    options=["All","X", "Y", "Z"],
+                    options=["All", "X", "Y", "Z"],
                     value=["All"],
                     multi=True,
+                    searchable=True,
                 ),
             ]
         ),
@@ -148,36 +150,38 @@ map_config = {
 layout = dbc.Container(
     [
         dbc.Row(
-            html.Div([
-                dbc.Col(
-                    [
-                        dbc.Row(
-                            [
-                                dbc.Col(production_card),
-                                dbc.Col(map_type_card),
-                            ]
-                        ),
-                        dbc.Row(
-                            [
-                                dbc.Col(counties_card),
-                                dbc.Col(operators_card),
-                            ]
-                        ),
-                        dbc.Row(active_card),
-                    ],
-                    width=4,
-                ),
-                dbc.Col(
-                    [
-                        dcc.Graph(
-                            id="map",
-                            figure=draw_base_map(),
-                            config=map_config,
-                        )
-                    ],
-                    width=8,
-                ),
-            ])
+            html.Div(
+                [
+                    dbc.Col(
+                        [
+                            dbc.Row(
+                                [
+                                    dbc.Col(production_card),
+                                    dbc.Col(map_type_card),
+                                ]
+                            ),
+                            dbc.Row(
+                                [
+                                    dbc.Col(counties_card),
+                                    dbc.Col(operators_card),
+                                ]
+                            ),
+                            dbc.Row(active_card),
+                        ],
+                        width=4,
+                    ),
+                    dbc.Col(
+                        [
+                            dcc.Graph(
+                                id="map",
+                                figure=draw_base_map(),
+                                config=map_config,
+                            )
+                        ],
+                        width=8,
+                    ),
+                ]
+            )
         ),
         dbc.Row(
             [
