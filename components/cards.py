@@ -15,7 +15,7 @@ production_card = dbc.Card(
                     value=[],
                     labelClassName="card-labels",
                     inputClassName="card-inputs",
-                    inline=True
+                    inline=True,
                 ),
             ],
         ),
@@ -37,8 +37,14 @@ active_card = dbc.Card(
                                     step=1,
                                     id="year-slider",
                                     value=[1991, 2022],
-                                    marks={str(year): str(year) for year in range(1930, 2022, 10)},
-                                    tooltip={"placement": "bottom", "always_visible": True},
+                                    marks={
+                                        str(year): str(year)
+                                        for year in range(1930, 2022, 10)
+                                    },
+                                    tooltip={
+                                        "placement": "bottom",
+                                        "always_visible": True,
+                                    },
                                     pushable=5,
                                 ),
                             ],
@@ -58,7 +64,7 @@ active_card = dbc.Card(
                                 ),
                                 dbc.FormText("Year from"),
                             ],
-                            width=2
+                            width=2,
                         ),
                         dbc.Col(
                             [
@@ -75,14 +81,14 @@ active_card = dbc.Card(
                                 ),
                                 dbc.FormText("Year from"),
                             ],
-                            width=2
+                            width=2,
                         ),
                     ]
                 )
             ],
-            className='sidebar-card'
+            className="sidebar-card",
         ),
-    ],  
+    ],
 )
 
 counties_card = dbc.Card(
@@ -98,7 +104,7 @@ counties_card = dbc.Card(
                     searchable=True,
                 ),
             ],
-            className='sidebar-card'
+            className="sidebar-card",
         ),
     ],
 )
@@ -116,7 +122,7 @@ operators_card = dbc.Card(
                     searchable=True,
                 ),
             ],
-            className='sidebar-card'
+            className="sidebar-card",
         ),
     ],
 )

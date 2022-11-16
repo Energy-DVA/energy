@@ -17,7 +17,7 @@ def scatter_commodity(df: pd.DataFrame, dm: DataManager, color: str, title: str)
         marker=go.scattermapbox.Marker(
             size=5,
             color=color,
-            # opacity=0.66,
+            opacity=0.6,
         ),
         text=df[dm.L_LEASE_ID],
         customdata=df[dm.L_COUNTY],
@@ -29,3 +29,7 @@ def scatter_commodity(df: pd.DataFrame, dm: DataManager, color: str, title: str)
         + "%{text}<br>"
         + "<extra></extra>",
     )
+
+
+def generate_plot_title(text):
+    return {"text": text, "y": 0.99, "x": 0.5, "xanchor": "center", "yanchor": "top"}

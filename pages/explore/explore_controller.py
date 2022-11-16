@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
 from utils.constants import YEAR_START, YEAR_END, OIL_COLOR, GAS_COLOR
-from utils.functions import scatter_commodity, log
+from utils.functions import scatter_commodity, log, generate_plot_title
 from pages.explore.explore_model import dm
 from components.base_map import draw_base_map
 
@@ -24,7 +24,7 @@ def update_map(map_type, commodity, activity, county, operators):
     # Handle error
     if len(commodity) == 0:
         return draw_base_map()
-    
+
     # Set flags
     if county == [] or county == ["All"]:
         county = None
@@ -66,14 +66,10 @@ def update_map(map_type, commodity, activity, county, operators):
         df_gas = df[df[dm.L_PRODUCES] == dm.L_PRODUCES_GAS]
 
         if "Oil" in commodity:
-            fig.add_trace(
-                scatter_commodity(df_oil, dm, OIL_COLOR, "Oil Leases")
-            )
+            fig.add_trace(scatter_commodity(df_oil, dm, OIL_COLOR, "Oil Leases"))
 
         if "Gas" in commodity:
-            fig.add_trace(
-                scatter_commodity(df_gas, dm, GAS_COLOR, "Gas Leases")
-            )
+            fig.add_trace(scatter_commodity(df_gas, dm, GAS_COLOR, "Gas Leases"))
     # else Counties only and continue with basemap
 
     fig.update_layout(
@@ -108,13 +104,9 @@ def update_plot(commodity, activity, county, operators, selection):
     if len(commodity) == 0:
         return go.Figure(
             layout={
-                'title': {
-                    'text':'Select appropriate inputs and/or Click-Drag Select on Map',
-                    'y':0.9,
-                    'x':0.5,
-                    'xanchor': 'center',
-                    'yanchor': 'top'
-                }
+                "title": generate_plot_title(
+                    "Select appropriate inputs and/or Click-Drag Select on Map"
+                )
             }
         )
 
@@ -148,7 +140,7 @@ def update_plot(commodity, activity, county, operators, selection):
             cols, None, county, operators, commodity_l, activity
         ).dropna()
         lease_ids = list(df[dm.L_LEASE_ID])
-    
+
     subplot_titles = [None, None]
     for commo in commodity:
         subplot_titles.append(f"Number of Wells of Selected {commo} Leases")
@@ -165,14 +157,28 @@ def update_plot(commodity, activity, county, operators, selection):
         subplot_titles=subplot_titles,
     )
 
+    fig.update_layout(
+        showlegend=False, 
+        title=generate_plot_title("Selected Data Production"),
+        margin = {"l": 0, "r": 0, "t": 50, "b": 0},
+    )
+
+    # Add Traces
     for i, commo in enumerate(commodity):
         # Retrieve Data
         df = dm.get_production_from_ids(commo.lower(), lease_ids, get_rate=False)
         # Plot the two traces
-        fig.add_trace(go.Scatter(x=df.index, y=df["PRODUCTION"]), row=1, col=i + 1)
-        fig.add_trace(go.Scatter(x=df.index, y=df["WELLS"]), row=2, col=i + 1)
-
-    fig.update_layout(showlegend=False, title_text="Selected Data Production")
+        color = OIL_COLOR if commo == "Oil" else GAS_COLOR
+        fig.add_trace(
+            go.Scatter(x=df.index, y=df["PRODUCTION"], line=dict(color=color)),
+            row=1,
+            col=i + 1,
+        )
+        fig.add_trace(
+            go.Scatter(x=df.index, y=df["WELLS"], line=dict(color=color)),
+            row=2,
+            col=i + 1,
+        )
 
     return fig
 

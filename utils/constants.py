@@ -1,11 +1,11 @@
 import geopandas as gpd
 import geojson
 
-MAP_SELECTION_COLOR = 'purple'
-MAP_MODEBAR_COLOR = 'deeppink'
+MAP_SELECTION_COLOR = "purple"
+MAP_MODEBAR_COLOR = "deeppink"
 MAP_MODEBAR_COLOR_ACTIVE = "rgb(100,0,200)"
-OIL_COLOR = 'rgba(0,200,0,0.75)'
-GAS_COLOR = 'rgba(200,0,0,0.75)'
+OIL_COLOR = "rgb(0,200,0)"
+GAS_COLOR = "rgb(200,0,0)"
 
 # Kansas Geometry Constants
 KANSAS_STATE = gpd.read_file("utils/geometry/cb_2018_us_county_500k.shp")

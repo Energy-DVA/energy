@@ -11,7 +11,7 @@ layout = html.Div(
     [
         dbc.Row(
             [
-                dbc.Col(title, width='auto', className='website-title'),
+                dbc.Col(title, width="auto", className="website-title"),
                 dbc.Col(tabs),
             ],
         ),
@@ -20,9 +20,9 @@ layout = html.Div(
                 dbc.Row(sidebar, className="sidebar-layout"),
                 dbc.Row(content, className="content-layout"),
             ],
-            id='page-body',
+            id="page-body",
             fluid=True,
         ),
     ],
-    className="dbc"
+    className="dbc",
 )

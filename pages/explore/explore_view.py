@@ -25,9 +25,9 @@ map_config = {
 # Define sidebar layout
 sidebar = dbc.Row(
     [
-        dbc.Col(production_card,width=2),
-        dbc.Col(counties_card,width=2),
-        dbc.Col(operators_card,width=2),
+        dbc.Col(production_card, width=2),
+        dbc.Col(counties_card, width=2),
+        dbc.Col(operators_card, width=2),
         dbc.Col(active_card),
     ],
 )
@@ -36,61 +36,74 @@ sidebar = dbc.Row(
 # Define page-content Layout
 
 map_type_selection = dcc.Dropdown(
-                        id="map_type",
-                        options=[
-                            {"label": "Kansas Counties Outlines", "value": "Counties"},
-                            {"label": "Scatter Plot of Individual Leases", "value": "Scatter Plot"},
-                            {"label": "Density Heatmap of Leases", "value": "Heat Map"},
-                        ],
-                        value="Counties",
-                    )
+    id="map_type",
+    options=[
+        {"label": "Kansas Counties Outlines", "value": "Counties"},
+        {"label": "Scatter Plot of Individual Leases", "value": "Scatter Plot"},
+        {"label": "Density Heatmap of Leases", "value": "Heat Map"},
+    ],
+    value="Counties",
+)
 
 
-layout = [html.Br(),dbc.Row(
-    [
-        dbc.Col(
-            dbc.Card(
-            [
-                dbc.CardHeader("Kansas State Map"),
-                dbc.CardBody(
+layout = [
+    html.Br(),
+    dbc.Row(
+        [
+            dbc.Col(
+                dbc.Card(
                     [
-                        dbc.Row(
+                        dbc.CardHeader("Kansas State Map"),
+                        dbc.CardBody(
                             [
-                                dbc.Col("Select Chart Type:", width='auto', style={"padding-top": "0.5%", 'padding-right':'0.5%'}),
-                                dbc.Col(map_type_selection, width=5),
+                                dbc.Row(
+                                    [
+                                        dbc.Col(
+                                            "Select Chart Type:",
+                                            width="auto",
+                                            style={
+                                                "padding-top": "0.5%",
+                                                "padding-right": "0.5%",
+                                            },
+                                        ),
+                                        dbc.Col(map_type_selection, width=5),
+                                    ]
+                                ),
+                                dbc.Row(
+                                    dcc.Loading(
+                                        dcc.Graph(
+                                            id="map",
+                                            figure=draw_base_map(),
+                                            config=map_config,
+                                            style={"padding-top": "1%"},
+                                        ),
+                                        id="loading-1",
+                                        type="default",
+                                    )
+                                ),
                             ]
                         ),
-                        dbc.Row(
+                    ]
+                )
+            ),
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader("Production Type"),
+                        dbc.CardBody(
                             dcc.Loading(
                                 dcc.Graph(
-                                    id="map",
-                                    figure=draw_base_map(),
-                                    config=map_config,
-                                    style={"padding-top": "1%"}
+                                    id="plot",
+                                    figure=go.Figure(),
                                 ),
                                 id="loading-1",
                                 type="default",
                             )
                         ),
-                    ]
+                    ],
+                    style={'height':'100%'}
                 ),
-            ]
-        )),
-        dbc.Col(
-            dbc.Card(
-            [
-                dbc.CardHeader("Production Type"),
-                dbc.CardBody(
-                    dcc.Loading(
-                        dcc.Graph(
-                            id="plot",
-                            figure=go.Figure(),
-                        ),
-                        id="loading-1",
-                        type="default",
-                    )
-                ),
-            ]
-        )),
-    ]
-)]
+            ),
+        ]
+    ),
+]
