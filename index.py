@@ -1,9 +1,6 @@
 from app import app
-
-from routes import render_page_content
-
-# Import all required callbacks here
 from environment.settings import APP_HOST, APP_PORT, APP_DEBUG
+from routes import render_page_content
 
 
 if __name__ == "__main__":

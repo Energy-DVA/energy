@@ -3,7 +3,6 @@ from dash import callback_context
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import pandas as pd
 from utils.constants import (
     YEAR_START,
     YEAR_END,
@@ -12,7 +11,12 @@ from utils.constants import (
     WATERMARK,
     CUSTOM_MODEBAR,
 )
-from utils.functions import scatter_commodity, log, generate_plot_title, generate_empty_plot
+from utils.functions import (
+    scatter_commodity,
+    log,
+    generate_plot_title,
+    generate_empty_plot,
+)
 from pages.explore.explore_model import dm
 from components.base_map import draw_base_map
 
@@ -137,7 +141,7 @@ def update_plot(commodity, activity, county, operators, selection):
         cols=max(1, len(commodity)),
         shared_xaxes=True,
         column_titles=[f"{commo} Leases" for commo in commodity],
-        horizontal_spacing = 0.13,
+        horizontal_spacing=0.13,
         vertical_spacing=0.02,
     )
 
@@ -163,38 +167,42 @@ def update_plot(commodity, activity, county, operators, selection):
         else:
             # Plot the two traces
             color = OIL_COLOR if commo == "Oil" else GAS_COLOR
-            units = 'bbl/d' if commo == "Oil" else 'Mscf/d'
-            
-            xaxis_title="Date"
-            yaxis_title_prod=f"Production ({units})"
-            yaxis_title_wells="Well Count"
-            
+            units = "bbl/d" if commo == "Oil" else "Mscf/d"
+
+            xaxis_title = "Date"
+            yaxis_title_prod = f"Production ({units})"
+            yaxis_title_wells = "Well Count"
+
             fig.add_trace(
                 go.Scatter(
                     x=df.index,
                     y=df[dm.CV_P_CAL_DAY_PROD].round(0),
                     line=dict(color=color),
-                    name = '',
-                    hovertemplate = "Daily Production: %{y}" + f" {units}<br>"
+                    name="",
+                    hovertemplate="Daily Production: %{y}" + f" {units}<br>",
                 ),
                 row=1,
                 col=i + 1,
             )
             fig.add_trace(
                 go.Scatter(
-                    x=df.index, 
-                    y=df[dm.P_WELLS].round(0), 
-                    line=dict(color='blue'),
-                    name = '',
-                    hovertemplate = "Total Wells: %{y}<br>"
+                    x=df.index,
+                    y=df[dm.P_WELLS].round(0),
+                    line=dict(color="blue"),
+                    name="",
+                    hovertemplate="Total Wells: %{y}<br>",
                 ),
                 row=2,
                 col=i + 1,
             )
-            
-            fig.update_xaxes(title_text=xaxis_title, title_standoff=0, row=2, col=i+1)
-            fig.update_yaxes( title_text=yaxis_title_prod, title_standoff=0, row=1, col=i+1)
-            fig.update_yaxes( title_text=yaxis_title_wells, title_standoff=0, row=2, col=i+1)
+
+            fig.update_xaxes(title_text=xaxis_title, title_standoff=0, row=2, col=i + 1)
+            fig.update_yaxes(
+                title_text=yaxis_title_prod, title_standoff=0, row=1, col=i + 1
+            )
+            fig.update_yaxes(
+                title_text=yaxis_title_wells, title_standoff=0, row=2, col=i + 1
+            )
 
     return fig
 

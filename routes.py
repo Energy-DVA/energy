@@ -4,11 +4,8 @@ from dash.dependencies import Input, Output
 
 from app import app
 
-
 from pages.explore import explore_view
-
-# from pages.gdp import gdp
-# from pages.iris import iris
+from pages.predict import predict_view
 
 
 @app.callback(
@@ -22,8 +19,11 @@ def render_page_content(tabvalue):
             explore_view.sidebar,
             explore_view.layout,
         )
-    # elif tabvalue == 'page_predict':
-    #     return gdp.layout
+    elif tabvalue == "page_predict":
+        return (
+            predict_view.sidebar,
+            predict_view.layout,
+        )
     # elif tabvalue == 'page_compare':
     #     return iris.layout
     else:

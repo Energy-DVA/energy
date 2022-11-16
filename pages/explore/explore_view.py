@@ -11,7 +11,12 @@ from components.cards import (
     operators_card,
 )
 
-from pages.explore.explore_controller import update_map, update_plot, update_slider_values, filter_based_on_input
+from pages.explore.explore_controller import (
+    update_map,
+    update_plot,
+    update_slider_values,
+    filter_based_on_input,
+)
 
 
 # Define Map Configuration
