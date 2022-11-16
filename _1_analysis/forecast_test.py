@@ -7,9 +7,9 @@ db_path = "/data/kansas_oil_gas_1.db"
 db_type = "sqlite"
 dm = DataManager(db_type, db_path)
 #%% Get all production data
-df_lease = dm.get_lease_info(years_start=(1980, 2020))
-lease_ids = df_lease[dm.L_LEASE_ID].tolist()
-df_prod = dm.get_production_from_ids("oil", lease_ids)
+# df_lease = dm.get_lease_info()
+# lease_ids = df_lease[dm.L_LEASE_ID].tolist()
+df_prod = dm.get_production_from_ids("oil", years_range=(1930, 2020))
 pred_period = 36
 #%% Create forecaster for SARIMA
 sarima = Forecaster(df_prod[dm.CV_P_CAL_DAY_PROD])

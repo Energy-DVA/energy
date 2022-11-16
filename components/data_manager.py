@@ -43,14 +43,21 @@ class DataManager:
         self.wells = self.meta.tables[self.WELLS_TABLE]
         self.tops = self.meta.tables[self.TOPS_TABLE]
 
-    def _create_conditions(
+    def _create_conditions_query(
         self,
-        lease_ids: Optional[List[str]],
-        counties: Optional[List[str]],
-        operators: Optional[List[str]],
-        produces: Optional[List[str]],
-        years_range: Optional[Tuple[int, int]],
+        cols: Optional[List[str]] = None,
+        lease_ids: Optional[List[str]] = None,
+        counties: Optional[List[str]] = None,
+        operators: Optional[List[str]] = None,
+        produces: Optional[List[str]] = None,
+        years_range: Optional[Tuple[int, int]] = None,
     ):
+        # -- Get the columns to select
+        if cols is None:
+            s_cols = self.lease
+        else:
+            s_cols = [self.lease.c[col] for col in cols]
+
         conditions = []
         # -- Add lease ids
         if lease_ids is not None:
@@ -73,7 +80,12 @@ class DataManager:
                 )
             )
 
-        return conditions
+        if len(conditions) >= 1:
+            s = select(s_cols).where(and_(*conditions))
+        else:
+            s = select(s_cols)
+
+        return s
 
     def get_lease_info(
         self,
@@ -82,24 +94,14 @@ class DataManager:
         counties: Optional[List[str]] = None,
         operators: Optional[List[str]] = None,
         produces: Optional[List[str]] = None,
-        years_start: Optional[List[int]] = None,
+        years_range: Optional[List[int]] = None,
     ) -> pd.DataFrame:
         """Get lease info for a list of lease ids, counties and operators"""
-        # -- Get the columns to select
-        if cols is None:
-            s_cols = self.lease
-        else:
-            s_cols = [self.lease.c[col] for col in cols]
 
         # -- Create the conditions
-        conditions = self._create_conditions(
-            lease_ids, counties, operators, produces, years_start
+        s = self._create_conditions_query(
+            cols, lease_ids, counties, operators, produces, years_range
         )
-
-        if len(conditions) >= 1:
-            s = select(s_cols).where(and_(*conditions))
-        else:
-            s = select(s_cols)
 
         df = pd.read_sql(s, self.engine)
 
@@ -108,7 +110,10 @@ class DataManager:
     def get_production_from_ids(
         self,
         prod_type: str,
-        lease_ids: Optional[List[str]] = None,
+        counties: Optional[List[str]] = None,
+        operators: Optional[List[str]] = None,
+        produces: Optional[List[str]] = None,
+        years_range: Optional[List[int]] = None,
         agg="sum",
         get_rate=True,
     ):
@@ -141,14 +146,23 @@ class DataManager:
             agg_func(table.c[self.P_PRODUCTION]).label(self.P_PRODUCTION),
         ]
 
-        if lease_ids is not None:
-            s = (
-                select(s_cols)
-                .where(table.c[self.P_LEASE_ID].in_(lease_ids))
-                .group_by(table.c[self.P_DATE])
+        s_lease = self._create_conditions_query(
+            cols=[self.L_LEASE_ID],
+            counties=counties,
+            operators=operators,
+            produces=produces,
+            years_range=years_range,
+        ).alias()
+
+        s = (
+            select(s_cols)
+            .select_from(
+                s_lease.join(
+                    table, s_lease.c[self.L_LEASE_ID] == table.c[self.P_LEASE_ID]
+                )
             )
-        else:
-            s = select(s_cols).group_by(table.c[self.P_DATE])
+            .group_by(table.c[self.P_DATE])
+        )
 
         df = pd.read_sql(s, self.engine)
 
