@@ -2,6 +2,7 @@ from app import app
 import plotly.graph_objects as go
 import pandas as pd
 from components.data_manager import DataManager
+from utils.constants import WATERMARK
 
 
 # Debugging function to log input to Console
@@ -30,6 +31,29 @@ def scatter_commodity(df: pd.DataFrame, dm: DataManager, color: str, title: str)
         + "<extra></extra>",
     )
 
+def generate_empty_plot():
+    fig = go.Figure(layout={
+        "title": generate_plot_title(
+            "Select Commodities and other Inputs. Click-Drag Select on Map to filter"
+        )
+    })
+    fig.add_layout_image(
+        dict(
+            source=WATERMARK,
+            xref="paper",
+            yref="paper",
+            x=0.5,
+            y=0.24,
+            sizex=0.5,
+            sizey=0.6,
+            xanchor="center",
+            yanchor="bottom",
+            sizing="contain",
+            opacity=0.5,
+            layer="below",
+        )
+    )
+    return fig
 
 def generate_plot_title(text):
     return {"text": text, "y": 0.99, "x": 0.5, "xanchor": "center", "yanchor": "top"}

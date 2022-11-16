@@ -1,5 +1,7 @@
 import plotly.graph_objects as go
-
+import plotly.express as px
+from components.data_manager import DataManager
+from utils.functions import scatter_commodity
 from utils.constants import (
     KANSAS_STATE,
     KANSAS_GEOJSON,
@@ -11,6 +13,8 @@ from utils.constants import (
     MAP_MODEBAR_COLOR_ACTIVE,
     OIL_COLOR,
     GAS_COLOR,
+    CUSTOM_MODEBAR,
+    YEARS_RANGE,
 )
 
 
@@ -40,12 +44,7 @@ def draw_base_map(midpoint=DEFAULT_MIDPOINT, zoom=DEFAULT_ZOOM):
         margin={"l": 0, "r": 0, "t": 0, "b": 0},
         autosize=True,
         newselection=dict(line=dict(color=MAP_SELECTION_COLOR, width=5, dash="solid")),
-        modebar={
-            "orientation": "h",
-            "bgcolor": "rgba(255,255,255,0.7)",
-            "color": MAP_MODEBAR_COLOR,
-            "activecolor": MAP_MODEBAR_COLOR_ACTIVE,
-        },
+        modebar=CUSTOM_MODEBAR,
         selectionrevision=revision,
         uirevision=revision,
     )

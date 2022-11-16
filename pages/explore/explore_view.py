@@ -48,86 +48,58 @@ map_type_selection = dcc.Dropdown(
 
 layout = [
     html.Br(),
-    dbc.Row(
+    dbc.CardGroup(
         [
-            dbc.Col(
-                dbc.Card(
-                    [
-                        dbc.CardHeader("Kansas State Map"),
-                        dbc.CardBody(
-                            [
-                                dbc.Row(
-                                    [
-                                        dbc.Col(
-                                            "Select Chart Type:",
-                                            width="auto",
-                                            style={
-                                                "padding-top": "0.5%",
-                                                "padding-right": "0.5%",
-                                            },
-                                        ),
-                                        dbc.Col(map_type_selection, width=5),
-                                    ]
-                                ),
-                                dbc.Row(
-                                    dcc.Loading(
-                                        dcc.Graph(
-                                            id="map",
-                                            figure=draw_base_map(),
-                                            config=map_config,
-                                            style={"padding-top": "1%"},
-                                        ),
-                                        id="loading-1",
-                                        type="default",
-                                    )
-                                ),
-                            ]
-                        ),
-                    ]
-                )
-            ),
-            dbc.Col(
-                dbc.Card(
-                    [
-                        dbc.CardHeader("Historical Production Plots"),
-                        dbc.CardBody(
-                            dcc.Loading(
-                                dcc.Graph(
-                                    id="plot",
-                                    figure=go.Figure(),
-                                ),
-                                id="loading-1",
-                                type="default",
-                            )
-                        ),
-                    ],
-                    style={'height':'100%'}
-                ),
-            ),
-        ]
-    ),
-    html.Br(),
-    dbc.Row(
-        dbc.Col([
             dbc.Card(
                 [
-                    dbc.CardHeader("Yearly Animation"),
+                    dbc.CardHeader("Kansas State Map"),
+                    dbc.CardBody(
+                        [
+                            dbc.Row(
+                                [
+                                    dbc.Col(
+                                        "Select Chart Type:",
+                                        width="auto",
+                                        style={
+                                            "padding-top": "0.5%",
+                                            "padding-right": "0.5%",
+                                        },
+                                    ),
+                                    dbc.Col(map_type_selection, width=5),
+                                ]
+                            ),
+                            dbc.Row(
+                                dcc.Loading(
+                                    dcc.Graph(
+                                        id="map",
+                                        figure=draw_base_map(),
+                                        config=map_config,
+                                        style={"padding-top": "1%"},
+                                    ),
+                                    id="loading-1",
+                                    type="default",
+                                )
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+            dbc.Card(
+                [
+                    dbc.CardHeader("Historical Production Plots"),
                     dbc.CardBody(
                         dcc.Loading(
                             dcc.Graph(
-                                id="animated-plot",
-                                figure=go.Figure(
-                                    
-                                
-                                ),
+                                id="plot",
+                                figure=go.Figure(),
+                                style={"padding-top": "3%"},
                             ),
                             id="loading-1",
                             type="default",
-                        )
+                        ),
                     ),
                 ],
-                style={'height':'100%'}
             ),
-        ])
-    )
+        ]
+    ),
 ]

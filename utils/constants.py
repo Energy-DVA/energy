@@ -5,9 +5,16 @@ from PIL import Image
 MAP_SELECTION_COLOR = "purple"
 MAP_MODEBAR_COLOR = "deeppink"
 MAP_MODEBAR_COLOR_ACTIVE = "rgb(100,0,200)"
+CUSTOM_MODEBAR = {
+    "orientation": "h",
+    "bgcolor": "rgba(255,255,255,0.7)",
+    "color": MAP_MODEBAR_COLOR,
+    "activecolor": MAP_MODEBAR_COLOR_ACTIVE,
+}
 OIL_COLOR = "rgb(0,200,0)"
 GAS_COLOR = "rgb(200,0,0)"
-WATERMARK = Image.open('components/watermark.png')
+WATERMARK = Image.open("components/watermark.png")
+YEARS_RANGE = [1930, 2022]
 
 # Kansas Geometry Constants
 KANSAS_STATE = gpd.read_file("utils/geometry/cb_2018_us_county_500k.shp")

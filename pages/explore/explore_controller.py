@@ -4,8 +4,15 @@ from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
-from utils.constants import YEAR_START, YEAR_END, OIL_COLOR, GAS_COLOR, WATERMARK
-from utils.functions import scatter_commodity, log, generate_plot_title
+from utils.constants import (
+    YEAR_START,
+    YEAR_END,
+    OIL_COLOR,
+    GAS_COLOR,
+    WATERMARK,
+    CUSTOM_MODEBAR,
+)
+from utils.functions import scatter_commodity, log, generate_plot_title, generate_empty_plot
 from pages.explore.explore_model import dm
 from components.base_map import draw_base_map
 
@@ -83,6 +90,8 @@ def update_map(map_type, commodity, activity, county, operators):
             bgcolor="White",
             bordercolor="Black",
             borderwidth=1,
+            itemclick=False,
+            itemdoubleclick=False,
         ),
         uirevision="base",
         selectionrevision="base",
@@ -104,13 +113,7 @@ def update_plot(commodity, activity, county, operators, selection):
 
     # Handle error
     if len(commodity) == 0:
-        return go.Figure(
-            layout={
-                "title": generate_plot_title(
-                    "Select appropriate inputs and/or Click-Drag Select on Map"
-                )
-            }
-        )
+        return generate_empty_plot()
 
     # Set flags
     if county == [] or county == ["All"]:
@@ -125,27 +128,26 @@ def update_plot(commodity, activity, county, operators, selection):
     if callback_context.triggered_id == "map":
         if selection is not None and len(selection["points"]) > 0:
             lease_ids = [int(pt["text"]) for pt in selection["points"]]
-
-    subplot_titles = [None, None]
-    for commo in commodity:
-        subplot_titles.append(f"Number of Wells of Selected {commo} Leases")
+        elif selection is not None and len(selection["points"]) == 0:
+            lease_ids = []
 
     # Develop plot
     fig = make_subplots(
         rows=2,
         cols=max(1, len(commodity)),
         shared_xaxes=True,
-        vertical_spacing=0.1,
-        column_titles=[
-            f"Rate of Selected {commo} Leases" for commo in commodity
-        ],
-        subplot_titles=subplot_titles,
+        column_titles=[f"{commo} Leases" for commo in commodity],
+        horizontal_spacing = 0.13,
+        vertical_spacing=0.02,
     )
 
     fig.update_layout(
         showlegend=False,
-        title=generate_plot_title("Selected Data Production"),
-        margin={"l": 0, "r": 0, "t": 50, "b": 0},
+        title=generate_plot_title("Daily Production Rates and Well Data"),
+        margin={"l": 25, "r": 25, "t": 50, "b": 50},
+        modebar=CUSTOM_MODEBAR,
+        hovermode="x",
+        autosize=True,
     )
 
     # Add Traces
@@ -154,35 +156,45 @@ def update_plot(commodity, activity, county, operators, selection):
         df = dm.get_production_from_ids(
             commo.lower(), lease_ids, county, operators, None, activity, get_rate=True
         )
-        
+
         # Add watermark if Years chosen when no data is available
-        if (len(df)==0):
-            fig.add_layout_image(
-                dict(
-                    source=WATERMARK,
-                    xref="paper", yref="paper",
-                    x=0.5, y=0.24,
-                    sizex=0.5, sizey=0.6,
-                    xanchor="center",
-                    yanchor="bottom",
-                    sizing="contain",
-                    opacity=0.5,
-                    layer="below"
-                )
-            )
+        if len(df) == 0:
+            return generate_empty_plot()
         else:
             # Plot the two traces
             color = OIL_COLOR if commo == "Oil" else GAS_COLOR
+            units = 'bbl/d' if commo == "Oil" else 'Mscf/d'
+            
+            xaxis_title="Date"
+            yaxis_title_prod=f"Production ({units})"
+            yaxis_title_wells="Well Count"
+            
             fig.add_trace(
-                go.Scatter(x=df.index, y=df[dm.CV_P_CAL_DAY_PROD], line=dict(color=color)),
+                go.Scatter(
+                    x=df.index,
+                    y=df[dm.CV_P_CAL_DAY_PROD].round(0),
+                    line=dict(color=color),
+                    name = '',
+                    hovertemplate = "Daily Production: %{y}" + f" {units}<br>"
+                ),
                 row=1,
                 col=i + 1,
             )
             fig.add_trace(
-                go.Scatter(x=df.index, y=df[dm.P_WELLS], line=dict(color=color)),
+                go.Scatter(
+                    x=df.index, 
+                    y=df[dm.P_WELLS].round(0), 
+                    line=dict(color='blue'),
+                    name = '',
+                    hovertemplate = "Total Wells: %{y}<br>"
+                ),
                 row=2,
                 col=i + 1,
             )
+            
+            fig.update_xaxes(title_text=xaxis_title, title_standoff=0, row=2, col=i+1)
+            fig.update_yaxes( title_text=yaxis_title_prod, title_standoff=0, row=1, col=i+1)
+            fig.update_yaxes( title_text=yaxis_title_wells, title_standoff=0, row=2, col=i+1)
 
     return fig
 

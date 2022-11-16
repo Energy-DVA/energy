@@ -1,7 +1,7 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 
-from utils.constants import COUNTIES
+from utils.constants import COUNTIES, YEARS_RANGE
 
 # Declare cards for UI
 production_card = dbc.Card(
@@ -32,14 +32,16 @@ active_card = dbc.Card(
                         dbc.Col(
                             [
                                 dcc.RangeSlider(
-                                    1930,
-                                    2022,
+                                    YEARS_RANGE[0],
+                                    YEARS_RANGE[1],
                                     step=1,
                                     id="year-slider",
-                                    value=[1991, 2022],
+                                    value=[1991, YEARS_RANGE[1]],
                                     marks={
                                         str(year): str(year)
-                                        for year in range(1930, 2022, 10)
+                                        for year in range(
+                                            YEARS_RANGE[0], YEARS_RANGE[1], 10
+                                        )
                                     },
                                     tooltip={
                                         "placement": "bottom",
@@ -53,8 +55,8 @@ active_card = dbc.Card(
                             [
                                 dbc.Input(
                                     type="number",
-                                    min=1930,
-                                    max=2022,
+                                    min=YEARS_RANGE[0],
+                                    max=YEARS_RANGE[1],
                                     id="activity-from",
                                     size="sm",
                                     value=1991,
@@ -70,11 +72,11 @@ active_card = dbc.Card(
                             [
                                 dbc.Input(
                                     type="number",
-                                    min=1930,
-                                    max=2022,
+                                    min=YEARS_RANGE[0],
+                                    max=YEARS_RANGE[1],
                                     id="activity-to",
                                     size="sm",
-                                    value=2022,
+                                    value=YEARS_RANGE[1],
                                     debounce=True,
                                     minlength=4,
                                     maxlength=4,
