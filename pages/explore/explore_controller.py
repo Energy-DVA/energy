@@ -138,7 +138,7 @@ def update_plot(commodity, activity, county, operators, selection):
         shared_xaxes=True,
         vertical_spacing=0.1,
         column_titles=[
-            f"Monthly Production of Selected {commo} Leases" for commo in commodity
+            f"Rate of Selected {commo} Leases" for commo in commodity
         ],
         subplot_titles=subplot_titles,
     )
@@ -146,7 +146,7 @@ def update_plot(commodity, activity, county, operators, selection):
     fig.update_layout(
         showlegend=False,
         title=generate_plot_title("Selected Data Production"),
-        margin = {"l": 0, "r": 0, "t": 50, "b": 0},
+        margin={"l": 0, "r": 0, "t": 50, "b": 0},
     )
 
     # Add Traces
@@ -158,12 +158,12 @@ def update_plot(commodity, activity, county, operators, selection):
         # Plot the two traces
         color = OIL_COLOR if commo == "Oil" else GAS_COLOR
         fig.add_trace(
-            go.Scatter(x=df.index, y=df["PRODUCTION"], line=dict(color=color)),
+            go.Scatter(x=df.index, y=df[dm.CV_P_CAL_DAY_PROD], line=dict(color=color)),
             row=1,
             col=i + 1,
         )
         fig.add_trace(
-            go.Scatter(x=df.index, y=df["WELLS"], line=dict(color=color)),
+            go.Scatter(x=df.index, y=df[dm.P_WELLS], line=dict(color=color)),
             row=2,
             col=i + 1,
         )
