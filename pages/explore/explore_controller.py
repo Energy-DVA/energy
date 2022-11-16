@@ -10,6 +10,9 @@ from pages.explore.explore_model import dm
 from components.base_map import draw_base_map
 
 
+from utils.functions import log
+
+
 @app.callback(
     Output("map", "figure"),
     Input("map_type", "value"),
@@ -113,33 +116,16 @@ def update_plot(commodity, activity, county, operators, selection):
     # Set flags
     if county == [] or county == ["All"]:
         county = None
-        lease_ids = None
     if operators == [] or operators == ["All"]:
         operators = None
 
     # Check if map selection triggered callback
     # If yes, retrieve selection leases
     # If selection is empty, do nothing and return original figure
+    lease_ids = None
     if callback_context.triggered_id == "map":
-        if selection != None and len(selection["points"]) > 0:
+        if selection is not None and len(selection["points"]) > 0:
             lease_ids = [int(pt["text"]) for pt in selection["points"]]
-        else:
-            lease_ids = None
-    else:
-        cols = [
-            dm.L_LEASE_ID,
-            dm.L_LATITUDE,
-            dm.L_LONGITUDE,
-            dm.L_PRODUCES,
-            dm.L_YEAR_START,
-            dm.L_YEAR_STOP,
-            dm.L_COUNTY,
-        ]
-        commodity_l = [x.upper() for x in commodity]
-        df = dm.get_lease_info(
-            cols, None, county, operators, commodity_l, activity
-        ).dropna()
-        lease_ids = list(df[dm.L_LEASE_ID])
 
     subplot_titles = [None, None]
     for commo in commodity:
@@ -158,7 +144,7 @@ def update_plot(commodity, activity, county, operators, selection):
     )
 
     fig.update_layout(
-        showlegend=False, 
+        showlegend=False,
         title=generate_plot_title("Selected Data Production"),
         margin = {"l": 0, "r": 0, "t": 50, "b": 0},
     )
@@ -166,7 +152,9 @@ def update_plot(commodity, activity, county, operators, selection):
     # Add Traces
     for i, commo in enumerate(commodity):
         # Retrieve Data
-        df = dm.get_production_from_ids(commo.lower(), lease_ids, get_rate=False)
+        df = dm.get_production_from_ids(
+            commo.lower(), lease_ids, county, operators, None, activity, get_rate=True
+        )
         # Plot the two traces
         color = OIL_COLOR if commo == "Oil" else GAS_COLOR
         fig.add_trace(
