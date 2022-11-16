@@ -9,7 +9,8 @@ app = dash.Dash(
     __name__,
     suppress_callback_exceptions=False,
     external_stylesheets=[
-        dbc.themes.BOOTSTRAP,
+        dbc.themes.DARKLY,
+        # dbc.themes.PULSE,
         # Add more sheets and place in utils.external_assets
     ],
     meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}],

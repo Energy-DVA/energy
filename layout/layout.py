@@ -25,11 +25,12 @@ layout = html.Div(
         ),
         dbc.Container(
             [
-                dbc.Col(sidebar, className="sidebar-layout"),
-                dbc.Col(content, className="content-layout"),
+                dbc.Row(sidebar, className="sidebar-layout"),
+                dbc.Row(content, className="content-layout"),
             ],
             id='page-body',
             fluid=True,
         ),
-    ]
+    ],
+    className="dbc"
 )

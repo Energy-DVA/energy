@@ -9,7 +9,6 @@ from components.cards import (
     active_card,
     counties_card,
     operators_card,
-    map_type_card,
 )
 
 # Define Map Configuration
@@ -21,40 +20,54 @@ map_config = {
 }
 
 # Define sidebar layout
-sidebar = [
-    dbc.Row(
-        [
-            dbc.Col(production_card),
-            dbc.Col(map_type_card),
-        ]
-    ),
-    dbc.Row(
-        [
-            dbc.Col(counties_card),
-            dbc.Col(operators_card),
-        ]
-    ),
-    dbc.Row(active_card),
-]
+sidebar = dbc.Row(
+    [
+        dbc.Col(production_card,width=2),
+        dbc.Col(counties_card,width=2),
+        dbc.Col(operators_card,width=2),
+        dbc.Col(active_card),
+    ],
+)
+
 
 
 # Define page-content Layout
-layout = [
-    dcc.Loading(
-        dcc.Graph(
-            id="map",
-            figure=draw_base_map(),
-            config=map_config,
+
+map_type_selection = dcc.Dropdown(
+                        id="map_type",
+                        options=[
+                            {"label": "Counties Only", "value": "Counties"},
+                            {"label": "Individual Leases", "value": "Scatter Plot"},
+                            {"label": "Density", "value": "Heat Map"},
+                        ],
+                        value="Counties",
+                    )
+
+layout = dbc.Row(
+    [
+        dbc.Col(
+            [   
+                map_type_selection,
+                dcc.Loading(
+                    dcc.Graph(
+                        id="map",
+                        figure=draw_base_map(),
+                        config=map_config,
+                    ),
+                    id="loading-1",
+                    type="default",
+                ),
+            ]
         ),
-        id="loading-1",
-        type="default",
-    ),
-    dcc.Loading(
-        dcc.Graph(
-            id="plot",
-            figure=go.Figure(),
+        dbc.Col(
+            dcc.Loading(
+                dcc.Graph(
+                    id="plot",
+                    figure=go.Figure(),
+                ),
+                id="loading-1",
+                type="default",
+            )
         ),
-        id="loading-1",
-        type="default",
-    ),
-]
+    ]
+)

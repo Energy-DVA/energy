@@ -19,7 +19,7 @@ production_card = dbc.Card(
             ]
         ),
     ],
-    body=True,
+    className='sidebar-card'
 )
 
 active_card = dbc.Card(
@@ -31,7 +31,20 @@ active_card = dbc.Card(
                     [
                         dbc.Col(
                             [
-                                "Year from:",
+                                dcc.RangeSlider(
+                                    1930,
+                                    2022,
+                                    step=1,
+                                    id="year-slider",
+                                    value=[1991, 2022],
+                                    marks={str(year): str(year) for year in range(1930, 2022, 15)},
+                                    tooltip={"placement": "bottom", "always_visible": True},
+                                    pushable=5,
+                                ),
+                            ],
+                        ),
+                        dbc.Col(
+                            [
                                 dbc.Input(
                                     type="number",
                                     min=1930,
@@ -40,12 +53,15 @@ active_card = dbc.Card(
                                     size="sm",
                                     value=1991,
                                     debounce=True,
+                                    minlength=4,
+                                    maxlength=4,
                                 ),
-                            ]
+                                dbc.FormText("Year from"),
+                            ],
+                            width=2
                         ),
                         dbc.Col(
                             [
-                                "Year to:",
                                 dbc.Input(
                                     type="number",
                                     min=1930,
@@ -54,26 +70,19 @@ active_card = dbc.Card(
                                     size="sm",
                                     value=2022,
                                     debounce=True,
+                                    minlength=4,
+                                    maxlength=4,
                                 ),
-                            ]
+                                dbc.FormText("Year from"),
+                            ],
+                            width=2
                         ),
                     ]
-                ),
-                html.Br(),
-                dcc.RangeSlider(
-                    1930,
-                    2022,
-                    step=1,
-                    id="year-slider",
-                    value=[1991, 2022],
-                    marks={str(year): str(year) for year in range(1930, 2022, 15)},
-                    tooltip={"placement": "bottom", "always_visible": True},
-                    pushable=5,
-                ),
+                )
             ]
         ),
     ],
-    body=True,
+    className='sidebar-card'
 )
 
 counties_card = dbc.Card(
@@ -91,7 +100,7 @@ counties_card = dbc.Card(
             ]
         ),
     ],
-    body=True,
+    className='sidebar-card'
 )
 
 operators_card = dbc.Card(
@@ -109,27 +118,5 @@ operators_card = dbc.Card(
             ]
         ),
     ],
-    body=True,
-)
-
-map_type_card = dbc.Card(
-    [
-        dbc.CardHeader("Lease Visualizations"),
-        dbc.CardBody(
-            [
-                dcc.RadioItems(
-                    id="map_type",
-                    options=[
-                        {"label": "Counties Only", "value": "Counties"},
-                        {"label": "Individual Leases", "value": "Scatter Plot"},
-                        {"label": "Density", "value": "Heat Map"},
-                    ],
-                    value="Counties",
-                    labelClassName="card-labels",
-                    inputClassName="card-inputs",
-                ),
-            ]
-        ),
-    ],
-    body=True,
+    className='sidebar-card'
 )
