@@ -115,8 +115,11 @@ layout = [
                     dbc.CardBody(
                         dcc.Loading(
                             dcc.Graph(
-                                id="plot",
-                                figure=go.Figure(),
+                                id="animated-plot",
+                                figure=go.Figure(
+                                    
+                                
+                                ),
                             ),
                             id="loading-1",
                             type="default",

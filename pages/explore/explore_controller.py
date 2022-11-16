@@ -4,11 +4,10 @@ from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
-from utils.constants import YEAR_START, YEAR_END, OIL_COLOR, GAS_COLOR
+from utils.constants import YEAR_START, YEAR_END, OIL_COLOR, GAS_COLOR, WATERMARK
 from utils.functions import scatter_commodity, log, generate_plot_title
 from pages.explore.explore_model import dm
 from components.base_map import draw_base_map
-
 
 from utils.functions import log
 
@@ -155,18 +154,35 @@ def update_plot(commodity, activity, county, operators, selection):
         df = dm.get_production_from_ids(
             commo.lower(), lease_ids, county, operators, None, activity, get_rate=True
         )
-        # Plot the two traces
-        color = OIL_COLOR if commo == "Oil" else GAS_COLOR
-        fig.add_trace(
-            go.Scatter(x=df.index, y=df[dm.CV_P_CAL_DAY_PROD], line=dict(color=color)),
-            row=1,
-            col=i + 1,
-        )
-        fig.add_trace(
-            go.Scatter(x=df.index, y=df[dm.P_WELLS], line=dict(color=color)),
-            row=2,
-            col=i + 1,
-        )
+        
+        # Add watermark if Years chosen when no data is available
+        if (len(df)==0):
+            fig.add_layout_image(
+                dict(
+                    source=WATERMARK,
+                    xref="paper", yref="paper",
+                    x=0.5, y=0.24,
+                    sizex=0.5, sizey=0.6,
+                    xanchor="center",
+                    yanchor="bottom",
+                    sizing="contain",
+                    opacity=0.5,
+                    layer="below"
+                )
+            )
+        else:
+            # Plot the two traces
+            color = OIL_COLOR if commo == "Oil" else GAS_COLOR
+            fig.add_trace(
+                go.Scatter(x=df.index, y=df[dm.CV_P_CAL_DAY_PROD], line=dict(color=color)),
+                row=1,
+                col=i + 1,
+            )
+            fig.add_trace(
+                go.Scatter(x=df.index, y=df[dm.P_WELLS], line=dict(color=color)),
+                row=2,
+                col=i + 1,
+            )
 
     return fig
 
