@@ -69,7 +69,7 @@ def generate_forecast_with_ci(
 
     # Define Colors
     train_color = "rgb(31, 119, 180)"
-    forecast_color = "rgb(0, 0, 180)"
+    forecast_color = "rgb(200, 0, 0)"
     ci_line_color = "rgb(100,100,100)"
     ci_fill_color = "rgba(68, 68, 68, 0.33)"
 
@@ -96,7 +96,7 @@ def generate_forecast_with_ci(
                 y=y_upper,
                 mode="lines",
                 marker=dict(color=ci_line_color),
-                line=dict(width=0),
+                line=dict(width=1),
                 showlegend=False,
             ),
             go.Scatter(
@@ -104,7 +104,7 @@ def generate_forecast_with_ci(
                 x=x_forecast,
                 y=y_lower,
                 marker=dict(color=ci_line_color),
-                line=dict(width=0),
+                line=dict(width=1),
                 mode="lines",
                 fillcolor=ci_fill_color,
                 fill="tonexty",
@@ -114,9 +114,17 @@ def generate_forecast_with_ci(
     )
 
     fig.update_layout(
+        xaxis_title="Date",
         yaxis_title="Commodity Forecast",
         title="Continuous, variable value error bars",
         hovermode="x",
     )
+
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(zeroline=True,
+                     zerolinecolor='black',
+                     zerolinewidth=1
+    )
+
 
     return fig

@@ -31,26 +31,27 @@ def update_predict_plot(commodity):
     import pandas as pd
     import numpy as np
 
+    # Read data
     df_train = pd.read_csv("pages/predict/xtrain.csv")
     df_valid = pd.read_csv("pages/predict/xvalid.csv")
     df_conf = pd.read_csv("pages/predict/confintx.csv")
+    
+    # If values go below 0, set it to 0
     df_conf["low"] = df_conf["low"].apply(lambda x: max(0, x))
     df_conf["high"] = df_conf["high"].apply(lambda x: max(0, x))
 
-    df_hist = pd.concat([df_train, df_valid])
-    df_hist["DATE"] = pd.to_datetime(df_hist["DATE"], infer_datetime_format=True)
-    df_conf["DATE"] = pd.to_datetime(df_conf["DATE"], infer_datetime_format=True)
-    df_hist = pd.merge(df_hist, df_conf, on="DATE", how="left")
-    df_hist["low"] = df_hist["low"].fillna(df_hist["MONTHLY_GAS_PROD"])
-    df_hist["high"] = df_hist["high"].fillna(df_hist["MONTHLY_GAS_PROD"])
-
-    x_train = df_hist["DATE"]
-    y_train = df_hist["MONTHLY_GAS_PROD"]
+    # To ensure connectivity on graph, append last value from train to forecast
+    df_train = pd.concat([df_train, df_valid.iloc[0:1]])
+    
+    # Define sets and plot the figure
+    x_train = df_train["DATE"]
+    y_train = df_train["MONTHLY_GAS_PROD"]
     x_forecast = df_valid["DATE"]
     y_forecast = df_valid["MONTHLY_GAS_PROD"]
     y_upper = df_conf["high"]
     y_lower = df_conf["low"]
-
-    return generate_forecast_with_ci(
+    fig = generate_forecast_with_ci(
         x_train, y_train, x_forecast, y_forecast, y_upper, y_lower
     )
+    
+    return fig
