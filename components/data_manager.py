@@ -77,12 +77,12 @@ class DataManager:
 
     def get_lease_info(
         self,
-        cols: Optional[List[str]],
-        lease_ids: Optional[List[str]],
-        counties: Optional[List[str]],
-        operators: Optional[List[str]],
-        produces: Optional[List[str]],
-        years_start: Optional[List[int]],
+        cols: Optional[List[str]] = None,
+        lease_ids: Optional[List[str]] = None,
+        counties: Optional[List[str]] = None,
+        operators: Optional[List[str]] = None,
+        produces: Optional[List[str]] = None,
+        years_start: Optional[List[int]] = None,
     ) -> pd.DataFrame:
         """Get lease info for a list of lease ids, counties and operators"""
         # -- Get the columns to select
@@ -96,7 +96,11 @@ class DataManager:
             lease_ids, counties, operators, produces, years_start
         )
 
-        s = select(s_cols).where(and_(*conditions))
+        if len(conditions) >= 1:
+            s = select(s_cols).where(and_(*conditions))
+        else:
+            s = select(s_cols)
+
         df = pd.read_sql(s, self.engine)
 
         return df

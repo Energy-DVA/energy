@@ -114,7 +114,6 @@ def update_plot(commodity, activity, county, operators, selection):
     # Set flags
     if county == [] or county == ["All"]:
         county = None
-        lease_ids = None
     if operators == [] or operators == ["All"]:
         operators = None
 
