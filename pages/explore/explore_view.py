@@ -11,6 +11,9 @@ from components.cards import (
     operators_card,
 )
 
+from pages.explore.explore_controller import update_map
+
+
 # Define Map Configuration
 map_config = {
     "displayModeBar": True,
@@ -35,38 +38,59 @@ sidebar = dbc.Row(
 map_type_selection = dcc.Dropdown(
                         id="map_type",
                         options=[
-                            {"label": "Counties Only", "value": "Counties"},
-                            {"label": "Individual Leases", "value": "Scatter Plot"},
-                            {"label": "Density", "value": "Heat Map"},
+                            {"label": "Kansas Counties Outlines", "value": "Counties"},
+                            {"label": "Scatter Plot of Individual Leases", "value": "Scatter Plot"},
+                            {"label": "Density Heatmap of Leases", "value": "Heat Map"},
                         ],
                         value="Counties",
                     )
 
-layout = dbc.Row(
+
+layout = [html.Br(),dbc.Row(
     [
         dbc.Col(
-            [   
-                map_type_selection,
-                dcc.Loading(
-                    dcc.Graph(
-                        id="map",
-                        figure=draw_base_map(),
-                        config=map_config,
-                    ),
-                    id="loading-1",
-                    type="default",
+            dbc.Card(
+            [
+                dbc.CardHeader("Kansas State Map"),
+                dbc.CardBody(
+                    [
+                        dbc.Row(
+                            [
+                                dbc.Col("Select Chart Type:", width='auto', style={"padding-top": "0.5%", 'padding-right':'0.5%'}),
+                                dbc.Col(map_type_selection, width=5),
+                            ]
+                        ),
+                        dbc.Row(
+                            dcc.Loading(
+                                dcc.Graph(
+                                    id="map",
+                                    figure=draw_base_map(),
+                                    config=map_config,
+                                    style={"padding-top": "1%"}
+                                ),
+                                id="loading-1",
+                                type="default",
+                            )
+                        ),
+                    ]
                 ),
             ]
-        ),
+        )),
         dbc.Col(
-            dcc.Loading(
-                dcc.Graph(
-                    id="plot",
-                    figure=go.Figure(),
+            dbc.Card(
+            [
+                dbc.CardHeader("Production Type"),
+                dbc.CardBody(
+                    dcc.Loading(
+                        dcc.Graph(
+                            id="plot",
+                            figure=go.Figure(),
+                        ),
+                        id="loading-1",
+                        type="default",
+                    )
                 ),
-                id="loading-1",
-                type="default",
-            )
-        ),
+            ]
+        )),
     ]
-)
+)]

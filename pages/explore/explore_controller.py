@@ -4,13 +4,10 @@ from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
-from utils.constants import YEAR_START, YEAR_END
-from utils.functions import scatter_commodity
+from utils.constants import YEAR_START, YEAR_END, OIL_COLOR, GAS_COLOR
+from utils.functions import scatter_commodity, log
 from pages.explore.explore_model import dm
 from components.base_map import draw_base_map
-
-
-from utils.functions import log
 
 
 @app.callback(
@@ -26,7 +23,7 @@ def update_map(map_type, commodity, activity, county, operators):
 
     # Handle error
     if len(commodity) == 0:
-        return go.Figure()
+        return draw_base_map()
     
     # Set flags
     if county == [] or county == ["All"]:
@@ -70,12 +67,12 @@ def update_map(map_type, commodity, activity, county, operators):
 
         if "Oil" in commodity:
             fig.add_trace(
-                scatter_commodity(df_oil, dm, "rgba(0,200,0,0.75)", "Oil Leases")
+                scatter_commodity(df_oil, dm, OIL_COLOR, "Oil Leases")
             )
 
         if "Gas" in commodity:
             fig.add_trace(
-                scatter_commodity(df_gas, dm, "rgba(200,0,0,0.75)", "Gas Leases")
+                scatter_commodity(df_gas, dm, GAS_COLOR, "Gas Leases")
             )
     # else Counties only and continue with basemap
 
@@ -109,7 +106,17 @@ def update_plot(commodity, activity, county, operators, selection):
 
     # Handle error
     if len(commodity) == 0:
-        return go.Figure()
+        return go.Figure(
+            layout={
+                'title': {
+                    'text':'Select appropriate inputs and/or Click-Drag Select on Map',
+                    'y':0.9,
+                    'x':0.5,
+                    'xanchor': 'center',
+                    'yanchor': 'top'
+                }
+            }
+        )
 
     # Set flags
     if county == [] or county == ["All"]:
@@ -122,7 +129,7 @@ def update_plot(commodity, activity, county, operators, selection):
     # If yes, retrieve selection leases
     # If selection is empty, do nothing and return original figure
     if callback_context.triggered_id == "map":
-        if len(selection["points"]) > 0:
+        if selection != None and len(selection["points"]) > 0:
             lease_ids = [int(pt["text"]) for pt in selection["points"]]
         else:
             lease_ids = None
@@ -142,8 +149,6 @@ def update_plot(commodity, activity, county, operators, selection):
         ).dropna()
         lease_ids = list(df[dm.L_LEASE_ID])
     
-    log(lease_ids)
-
     subplot_titles = [None, None]
     for commo in commodity:
         subplot_titles.append(f"Number of Wells of Selected {commo} Leases")

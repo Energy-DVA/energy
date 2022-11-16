@@ -6,6 +6,11 @@ from utils.constants import (
     DEFAULT_MIDPOINT,
     DEFAULT_ZOOM,
     COUNTIES,
+    MAP_SELECTION_COLOR,
+    MAP_MODEBAR_COLOR,
+    MAP_MODEBAR_COLOR_ACTIVE,
+    OIL_COLOR,
+    GAS_COLOR
 )
 
 
@@ -26,7 +31,7 @@ def draw_base_map(midpoint=DEFAULT_MIDPOINT, zoom=DEFAULT_ZOOM):
                     "source": KANSAS_GEOJSON,
                     "below": "traces",
                     "type": "line",
-                    "color": "purple",
+                    "color": 'black',
                     "line": {"width": 1.5},
                 }
             ],
@@ -34,12 +39,12 @@ def draw_base_map(midpoint=DEFAULT_MIDPOINT, zoom=DEFAULT_ZOOM):
         },
         margin={"l": 0, "r": 0, "t": 0, "b": 0},
         autosize=True,
-        newselection=dict(line=dict(color="Crimson", width=2, dash="dash")),
+        newselection=dict(line=dict(color=MAP_SELECTION_COLOR, width=5, dash="dash")),
         modebar={
             "orientation": "h",
             "bgcolor": "rgba(255,255,255,0.7)",
-            "color": "rgb(255,0,0)",
-            "activecolor": "rgb(100,0,200)",
+            "color": MAP_MODEBAR_COLOR,
+            "activecolor": MAP_MODEBAR_COLOR_ACTIVE,
         },
         selectionrevision=revision,
         uirevision=revision,

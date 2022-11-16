@@ -1,10 +1,12 @@
 .card-labels {
-    display: block;
-    margin-top: -4%;
+    margin-top: -2%;
+    margin-left: 20%;
 }
 
 .card-inputs {
-    margin-left: 3%;
-    margin-right: 5%;
-    margin-top: 6%;
+    margin-right: 0.25vw;
+}
+
+.sidebar-card {
+    margin-bottom: -2%;
 }

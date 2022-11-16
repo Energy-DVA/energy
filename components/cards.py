@@ -12,14 +12,14 @@ production_card = dbc.Card(
                 dcc.Checklist(
                     id="commodity",
                     options=["Oil", "Gas"],
-                    value=["Oil", "Gas"],
+                    value=[],
                     labelClassName="card-labels",
                     inputClassName="card-inputs",
+                    inline=True
                 ),
-            ]
+            ],
         ),
     ],
-    className='sidebar-card'
 )
 
 active_card = dbc.Card(
@@ -37,7 +37,7 @@ active_card = dbc.Card(
                                     step=1,
                                     id="year-slider",
                                     value=[1991, 2022],
-                                    marks={str(year): str(year) for year in range(1930, 2022, 15)},
+                                    marks={str(year): str(year) for year in range(1930, 2022, 10)},
                                     tooltip={"placement": "bottom", "always_visible": True},
                                     pushable=5,
                                 ),
@@ -79,10 +79,10 @@ active_card = dbc.Card(
                         ),
                     ]
                 )
-            ]
+            ],
+            className='sidebar-card'
         ),
-    ],
-    className='sidebar-card'
+    ],  
 )
 
 counties_card = dbc.Card(
@@ -97,10 +97,10 @@ counties_card = dbc.Card(
                     multi=True,
                     searchable=True,
                 ),
-            ]
+            ],
+            className='sidebar-card'
         ),
     ],
-    className='sidebar-card'
 )
 
 operators_card = dbc.Card(
@@ -115,8 +115,8 @@ operators_card = dbc.Card(
                     multi=True,
                     searchable=True,
                 ),
-            ]
+            ],
+            className='sidebar-card'
         ),
     ],
-    className='sidebar-card'
 )

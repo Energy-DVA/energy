@@ -5,6 +5,11 @@
     padding-top: 1%;
 }
 
+.card-text {
+    display : flex;
+    vertical-align: middle;
+}
+
 #page-body {
     padding-top : 5vh ;
 }
