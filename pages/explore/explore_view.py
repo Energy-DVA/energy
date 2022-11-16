@@ -89,7 +89,7 @@ layout = [
             dbc.Col(
                 dbc.Card(
                     [
-                        dbc.CardHeader("Production Type"),
+                        dbc.CardHeader("Historical Production Plots"),
                         dbc.CardBody(
                             dcc.Loading(
                                 dcc.Graph(
@@ -106,4 +106,25 @@ layout = [
             ),
         ]
     ),
+    html.Br(),
+    dbc.Row(
+        dbc.Col([
+            dbc.Card(
+                [
+                    dbc.CardHeader("Yearly Animation"),
+                    dbc.CardBody(
+                        dcc.Loading(
+                            dcc.Graph(
+                                id="plot",
+                                figure=go.Figure(),
+                            ),
+                            id="loading-1",
+                            type="default",
+                        )
+                    ),
+                ],
+                style={'height':'100%'}
+            ),
+        ])
+    )
 ]
