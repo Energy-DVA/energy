@@ -27,7 +27,7 @@ def update_map(map_type, commodity, activity, county, operators):
     # Handle error
     if len(commodity) == 0:
         return go.Figure()
-    
+
     # Set flags
     if county == [] or county == ["All"]:
         county = None
@@ -120,28 +120,10 @@ def update_plot(commodity, activity, county, operators, selection):
     # Check if map selection triggered callback
     # If yes, retrieve selection leases
     # If selection is empty, do nothing and return original figure
+    lease_ids = None
     if callback_context.triggered_id == "map":
         if len(selection["points"]) > 0:
             lease_ids = [int(pt["text"]) for pt in selection["points"]]
-        else:
-            lease_ids = None
-    else:
-        cols = [
-            dm.L_LEASE_ID,
-            dm.L_LATITUDE,
-            dm.L_LONGITUDE,
-            dm.L_PRODUCES,
-            dm.L_YEAR_START,
-            dm.L_YEAR_STOP,
-            dm.L_COUNTY,
-        ]
-        commodity_l = [x.upper() for x in commodity]
-        df = dm.get_lease_info(
-            cols, None, county, operators, commodity_l, activity
-        ).dropna()
-        lease_ids = list(df[dm.L_LEASE_ID])
-    
-    log(lease_ids)
 
     subplot_titles = [None, None]
     for commo in commodity:
@@ -160,8 +142,11 @@ def update_plot(commodity, activity, county, operators, selection):
     )
 
     for i, commo in enumerate(commodity):
+        print("test")
         # Retrieve Data
-        df = dm.get_production_from_ids(commo.lower(), lease_ids, get_rate=False)
+        df = dm.get_production_from_ids(
+            commo.lower(), lease_ids, county, operators, None, activity, get_rate=True
+        )
         # Plot the two traces
         fig.add_trace(go.Scatter(x=df.index, y=df["PRODUCTION"]), row=1, col=i + 1)
         fig.add_trace(go.Scatter(x=df.index, y=df["WELLS"]), row=2, col=i + 1)

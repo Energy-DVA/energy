@@ -110,6 +110,7 @@ class DataManager:
     def get_production_from_ids(
         self,
         prod_type: str,
+        lease_ids: Optional[List[str]] = None,
         counties: Optional[List[str]] = None,
         operators: Optional[List[str]] = None,
         produces: Optional[List[str]] = None,
@@ -148,6 +149,7 @@ class DataManager:
 
         s_lease = self._create_conditions_query(
             cols=[self.L_LEASE_ID],
+            lease_ids=lease_ids,
             counties=counties,
             operators=operators,
             produces=produces,
