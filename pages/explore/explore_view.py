@@ -30,7 +30,6 @@ sidebar = dbc.Row(
 )
 
 
-
 # Define page-content Layout
 
 map_type_selection = dcc.Dropdown(

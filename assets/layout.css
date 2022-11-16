@@ -1,24 +1,9 @@
-/*.sidebar-layout {
-    display: inline-block;
-    position: fixed;
-    background-color: #f8f9fa;
-    width: 30%;
+.website-title {
+    display : flex;
+    align-items: flex-end;
+    margin-left: 1%;
+    padding-top: 1%;
 }
-
-.content-layout {
-    display: inline-block;
-    vertical-align: top;
-    width: 66%;
-    margin-left: 33vw;
-}*/
-
-#website-title {
-    text-align: right;
-}
-
-/*#header {
-    border: 1px black solid;
-}*/
 
 #page-body {
     padding-top : 5vh ;

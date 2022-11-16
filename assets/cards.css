@@ -1,20 +1,10 @@
 .card-labels {
     display: block;
-    /*margin-top: -5%;*/
+    margin-top: -4%;
 }
 
 .card-inputs {
-    margin-left: 3%
-    /*margin-right: 5%;
-    margin-top: 6%;*/
+    margin-left: 3%;
+    margin-right: 5%;
+    margin-top: 6%;
 }
-
-/*.sidebar-card {
-
-
-}
-
-#year-slider {
-    background-color: gray
-    stroke-color : blue
-}*/

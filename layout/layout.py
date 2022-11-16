@@ -3,25 +3,17 @@ import dash_bootstrap_components as dbc
 
 from layout.tabs.tabs import tabs
 
-SIDEBAR_WIDTH = 4
-
-
-title = html.H1("Kansas Production Forecast", id='website-title')
+title = html.H1("Kansas Production Forecast")
 sidebar = html.Div(id="sidebar")
 content = html.Div(id="page-content")
-
-
-# sidebar_style = {'display': 'inline-block', "position": "fixed", "background-color": "#f8f9fa"}
-# content_style = {'display': 'inline-block', 'vertical-align': 'top', 'margin-left': f'{OFFSET_VW}vw'}
 
 layout = html.Div(
     [
         dbc.Row(
             [
-                dbc.Col(title, width='auto'),
+                dbc.Col(title, width='auto', className='website-title'),
                 dbc.Col(tabs),
             ],
-            id='header'
         ),
         dbc.Container(
             [
