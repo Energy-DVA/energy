@@ -13,8 +13,12 @@ CUSTOM_MODEBAR = {
 }
 OIL_COLOR = "rgb(0,200,0)"
 GAS_COLOR = "rgb(200,0,0)"
+WELL_COLOR = "lightseagreen"
 WATERMARK = Image.open("components/watermark.png")
 YEARS_RANGE = [1930, 2022]
+
+OIL_UNITS = "bbl/d"
+GAS_UNITS = "Mscf/d"
 
 # Kansas Geometry Constants
 KANSAS_STATE = gpd.read_file("utils/geometry/cb_2018_us_county_500k.shp")

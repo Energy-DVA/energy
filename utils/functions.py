@@ -1,8 +1,18 @@
 from app import app
 import plotly.graph_objects as go
 import pandas as pd
+from plotly.subplots import make_subplots
+
+from utils.constants import (
+    WATERMARK,
+    OIL_UNITS,
+    GAS_UNITS,
+    OIL_COLOR,
+    GAS_COLOR,
+    WELL_COLOR,
+    CUSTOM_MODEBAR
+)
 from components.data_manager import DataManager
-from utils.constants import WATERMARK
 
 
 # Debugging function to log input to Console
@@ -64,66 +74,155 @@ def generate_plot_title(text):
 
 
 def generate_forecast_with_ci(
-    x_train, y_train, x_forecast, y_forecast, y_upper, y_lower
+    commodity, x_train, y_train, x_forecast, y_forecast, y_upper, y_lower, well_train, well_forecast
 ):
 
-    # Define Colors
-    train_color = "rgb(31, 119, 180)"
-    forecast_color = "rgb(200, 0, 0)"
+    # Define Colors and units
+    units = OIL_UNITS if commodity == "Oil" else GAS_UNITS
+    train_color = OIL_COLOR if commodity == "Oil" else GAS_COLOR
+    forecast_color = "blue"
     ci_line_color = "rgb(100,100,100)"
     ci_fill_color = "rgba(68, 68, 68, 0.33)"
 
-    # Generate figure
-    fig = go.Figure(
-        [
-            go.Scatter(
-                name="Measurement",
-                x=x_train,
-                y=y_train,
-                mode="lines",
-                line=dict(color=train_color),
-            ),
-            go.Scatter(
-                name="Measurement",
-                x=x_forecast,
-                y=y_forecast,
-                mode="lines",
-                line=dict(color=forecast_color),
-            ),
-            go.Scatter(
-                name="Upper Bound",
-                x=x_forecast,
-                y=y_upper,
-                mode="lines",
-                marker=dict(color=ci_line_color),
-                line=dict(width=1),
-                showlegend=False,
-            ),
-            go.Scatter(
-                name="Lower Bound",
-                x=x_forecast,
-                y=y_lower,
-                marker=dict(color=ci_line_color),
-                line=dict(width=1),
-                mode="lines",
-                fillcolor=ci_fill_color,
-                fill="tonexty",
-                showlegend=False,
-            ),
-        ]
+    # Make 2 subplots. Top for production data, bottom for wells
+    fig = make_subplots(
+        rows=2,
+        cols=1,
+        shared_xaxes=True,
+        vertical_spacing=0.02,
     )
+
+    # Generate figure
+    fig.add_trace(
+        go.Scatter(
+            x=x_train,
+            y=y_train,
+            mode="lines",
+            line=dict(color=train_color),
+            name="",
+            hovertemplate="Historical Production: %{y}" + f"{units}<br>",
+        ),
+        row=1,
+        col=1
+    )
+    
+    fig.add_trace(
+        go.Scatter(
+            x=x_forecast,
+            y=y_forecast,
+            mode="lines",
+            line=dict(color=forecast_color),
+            name="",
+            hovertemplate="Forecasted Production: %{y}" + f"{units}<br>",
+        ),
+        row=1,
+        col=1
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=x_forecast,
+            y=y_upper,
+            mode="lines",
+            marker=dict(color=ci_line_color),
+            line=dict(width=1),
+            showlegend=False,
+            name="",
+            hovertemplate="Forecast Upper Bound: %{y}" + f"{units}<br>",
+        ),
+        row=1,
+        col=1
+    )
+    
+    fig.add_trace(
+        go.Scatter(
+            x=x_forecast,
+            y=y_lower,
+            marker=dict(color=ci_line_color),
+            line=dict(width=1),
+            mode="lines",
+            fillcolor=ci_fill_color,
+            fill="tonexty",
+            showlegend=False,
+            name="",
+            hovertemplate="Forecast Lower Bound: %{y}" + f"{units}<br>",
+        ),
+        row=1,
+        col=1
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=x_train,
+            y=well_train,
+            mode="lines",
+            line=dict(color=WELL_COLOR),
+            name="",
+            hovertemplate="Historical Well Count: %{y}<br>",
+        ),
+        row=2,
+        col=1
+    )
+    
+    fig.add_trace(
+        go.Scatter(
+            x=x_forecast,
+            y=well_forecast,
+            mode="lines",
+            line=dict(color=forecast_color),
+            name="",
+            hovertemplate="Forecasted Well Count: %{y}<br>",
+        ),
+        row=2,
+        col=1
+    )
+    
+    # Add Vertical Lines
+    fig.add_vline(x=x_forecast.iloc[0], line_width=2, line_dash="dot", line_color="black", row=1, col=1)
+    fig.add_vline(x=x_forecast.iloc[0], line_width=2, line_dash="dot", line_color="black", row=2, col=1)
 
     fig.update_layout(
-        xaxis_title="Date",
-        yaxis_title="Commodity Forecast",
-        title="Continuous, variable value error bars",
+        yaxis_title=f"{commodity} Production ({units})",
+        title=generate_plot_title(
+                "Commodity Production Forecast and Well Data "
+            ),
         hovermode="x",
+        margin={"l": 25, "r": 25, "t": 50, "b": 50},
+        modebar=CUSTOM_MODEBAR,
+        showlegend=False,
     )
-
-    fig.update_xaxes(showgrid=False)
+    
+    # Update X-axes
+    fig.update_xaxes(
+        showgrid=False,
+        row=1,
+        col=1
+    )
+    fig.update_xaxes(
+        title_text="Date",
+        title_standoff=0,
+        row=2,
+        col=1,
+        showgrid=False
+    )
+    # Update all y axes
     fig.update_yaxes(zeroline=True,
                      zerolinecolor='black',
                      zerolinewidth=1
+    )
+    # Update top Y axis
+    fig.update_yaxes(
+        title_text=f"Production ({units})",
+        title_standoff=0,
+        row=1,
+        col=1
+    )
+    # Update bottom Y axis
+    fig.update_yaxes(
+        title_text="Well Count",
+        title_standoff=0,
+        row=2,
+        col=1
     )
 
 

@@ -4,12 +4,12 @@ from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from utils.constants import (
-    YEAR_START,
-    YEAR_END,
     OIL_COLOR,
     GAS_COLOR,
-    WATERMARK,
     CUSTOM_MODEBAR,
+    OIL_UNITS,
+    GAS_UNITS,
+    WELL_COLOR
 )
 from utils.functions import (
     scatter_commodity,
@@ -167,11 +167,7 @@ def update_plot(commodity, activity, county, operators, selection):
         else:
             # Plot the two traces
             color = OIL_COLOR if commo == "Oil" else GAS_COLOR
-            units = "bbl/d" if commo == "Oil" else "Mscf/d"
-
-            xaxis_title = "Date"
-            yaxis_title_prod = f"Production ({units})"
-            yaxis_title_wells = "Well Count"
+            units = OIL_UNITS if commodity == "Oil" else GAS_UNITS
 
             fig.add_trace(
                 go.Scatter(
@@ -188,7 +184,7 @@ def update_plot(commodity, activity, county, operators, selection):
                 go.Scatter(
                     x=df.index,
                     y=df[dm.P_WELLS].round(0),
-                    line=dict(color="blue"),
+                    line=dict(color=WELL_COLOR),
                     name="",
                     hovertemplate="Total Wells: %{y}<br>",
                 ),
@@ -196,13 +192,12 @@ def update_plot(commodity, activity, county, operators, selection):
                 col=i + 1,
             )
 
+            xaxis_title = "Date"
+            yaxis_title_prod = f"Production ({units})"
+            yaxis_title_wells = "Well Count"
             fig.update_xaxes(title_text=xaxis_title, title_standoff=0, row=2, col=i + 1)
-            fig.update_yaxes(
-                title_text=yaxis_title_prod, title_standoff=0, row=1, col=i + 1
-            )
-            fig.update_yaxes(
-                title_text=yaxis_title_wells, title_standoff=0, row=2, col=i + 1
-            )
+            fig.update_yaxes(title_text=yaxis_title_prod, title_standoff=0, row=1, col=i + 1)
+            fig.update_yaxes(title_text=yaxis_title_wells, title_standoff=0, row=2, col=i + 1)
 
     return fig
 

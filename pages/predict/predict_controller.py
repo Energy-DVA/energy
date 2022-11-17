@@ -6,10 +6,6 @@ from plotly.subplots import make_subplots
 from utils.constants import (
     YEAR_START,
     YEAR_END,
-    OIL_COLOR,
-    GAS_COLOR,
-    WATERMARK,
-    CUSTOM_MODEBAR,
 )
 from utils.functions import (
     scatter_commodity,
@@ -45,13 +41,17 @@ def update_predict_plot(commodity):
     
     # Define sets and plot the figure
     x_train = df_train["DATE"]
-    y_train = df_train["MONTHLY_GAS_PROD"]
     x_forecast = df_valid["DATE"]
-    y_forecast = df_valid["MONTHLY_GAS_PROD"]
-    y_upper = df_conf["high"]
-    y_lower = df_conf["low"]
-    fig = generate_forecast_with_ci(
-        x_train, y_train, x_forecast, y_forecast, y_upper, y_lower
+    y_train = df_train["MONTHLY_GAS_PROD"].round(0)
+    y_forecast = df_valid["MONTHLY_GAS_PROD"].round(0)
+    y_upper = df_conf["high"].round(0)
+    y_lower = df_conf["low"].round(0)
+    well_train = df_train["N_WELLS"]
+    well_forecast = df_valid["N_WELLS"]
+    
+    commodity_type = commodity[0]
+    fig = generate_forecast_with_ci(commodity_type,
+        x_train, y_train, x_forecast, y_forecast, y_upper, y_lower, well_train, well_forecast
     )
     
     return fig
