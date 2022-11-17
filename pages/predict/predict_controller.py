@@ -13,7 +13,7 @@ from utils.functions import (
     generate_plot_title,
     generate_empty_plot,
 )
-from pages.predict.predict_model import dm
+from pages.predict.predict_model import dm, selected_data
 
 from utils.functions import log, generate_forecast_with_ci
 
@@ -68,3 +68,13 @@ def update_predict_plot(commodity):
     )
 
     return fig
+
+
+@app.callback(
+    Output("map", "selectedData"), 
+    Input("map", "selectedData"),
+)
+def store_map_selected_data(x):
+    selected_data = x
+    print(selected_data)
+    return x

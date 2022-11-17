@@ -9,16 +9,21 @@ from components.cards import (
     counties_card,
     operators_card,
     production_radio_card,
+    predict_instructions_card,
+    predict_forecast_time_card,
+    predict_forecast_wells_card,
+    predict_execute_card,
 )
 
-from pages.predict.predict_controller import update_predict_plot
+from pages.predict.predict_controller import update_predict_plot, store_map_selected_data
 
 sidebar = dbc.Row(
     [
-        dbc.Col(production_radio_card, width=2),
-        dbc.Col(counties_card, width=2),
-        dbc.Col(operators_card, width=2),
-        dbc.Col(active_card),
+        dbc.Col(predict_instructions_card, width=4),
+        dbc.Col(production_radio_card, width=1),
+        dbc.Col(predict_forecast_time_card, width=1),
+        dbc.Col(predict_forecast_wells_card),
+        dbc.Col(predict_execute_card, width=1),
     ],
 )
 

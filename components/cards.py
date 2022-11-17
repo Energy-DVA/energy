@@ -4,6 +4,130 @@ import dash_bootstrap_components as dbc
 from utils.constants import COUNTIES, YEARS_RANGE
 
 # Declare cards for UI
+instructions = [
+                html.P("Use 'Explore' tab to make selections of data"),
+                html.P("Fill forecast details to the right and watch the magic!")
+            ]
+predict_instructions_card = dbc.Card(
+    [
+        dbc.CardHeader("Instructions"),
+        dbc.CardBody(html.Ol([html.Li(i) for i in instructions]))
+    ],
+)
+
+
+production_radio_card = dbc.Card(
+    [
+        dbc.CardHeader("Pick:"),
+        dbc.CardBody(
+            [
+                dcc.RadioItems(
+                    id="commodity-radio",
+                    options=["Oil", "Gas"],
+                    value='Oil',
+                    labelClassName="card-labels",
+                    inputClassName="card-inputs",
+                    inline=False,
+                ),
+            ],
+        ),
+    ],
+)
+
+predict_forecast_time_card = dbc.Card(
+    [
+        dbc.CardHeader("Input:"),
+        dbc.CardBody(
+            [
+                dbc.Input(
+                    type="number",
+                    min=0,
+                    id="predict-months",
+                    size="sm",
+                    value=None,
+                    debounce=True,
+                ),
+                dbc.FormText("Months to Forecast"),
+            ],
+        )
+    ],
+)
+
+predict_forecast_wells_card = dbc.Card(
+    [
+        dbc.CardHeader("Choose (multiple inputs possible):"),
+        dbc.CardBody(
+            [
+                dbc.Row(
+                    [
+                        dbc.Col(
+                            [
+                                dbc.Input(
+                                    type="number",
+                                    min=0,
+                                    id="predict-wells",
+                                    size="sm",
+                                    value=None,
+                                    debounce=True,
+                                    ),
+                                dbc.FormText("Num. of Wells"),
+                                
+                            ],
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Input(
+                                    type="number",
+                                    min=0,
+                                    id="predict-wells-month",
+                                    size="sm",
+                                    value=None,
+                                    debounce=True,
+                                ),
+                                dbc.FormText("for time period (months)"),
+                            ],
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Button(id='wells-submit-button', n_clicks=0, children='Submit',
+                                           size='sm',
+                                           color="secondary"),
+                            ],
+                        ),
+                        dbc.Col(
+                            [
+                                dcc.Textarea(
+                                    id="forecast-well-input",
+                                    value='',
+                                    disabled=True,
+                                    className='text-area',
+                                ),
+                            ],
+                        ),
+                    ]
+                ),
+            ],
+        )
+    ],
+)
+
+predict_execute_card = dbc.Card(
+    [
+        dbc.CardHeader("Execute:"),
+        dbc.CardBody(
+            [
+                dbc.Button(id='forecast-execute-button', 
+                            n_clicks=0, 
+                            children='FORECAST',
+                            size='sm',
+                            color="primary",
+                )
+            ],
+        ),
+    ],
+)
+
+
 production_card = dbc.Card(
     [
         dbc.CardHeader("Production Type"),
@@ -13,24 +137,6 @@ production_card = dbc.Card(
                     id="commodity",
                     options=["Oil", "Gas"],
                     value=[],
-                    labelClassName="card-labels",
-                    inputClassName="card-inputs",
-                    inline=True,
-                ),
-            ],
-        ),
-    ],
-)
-
-production_radio_card = dbc.Card(
-    [
-        dbc.CardHeader("Production Type"),
-        dbc.CardBody(
-            [
-                dcc.RadioItems(
-                    id="commodity-radio",
-                    options=["Oil", "Gas"],
-                    value='Oil',
                     labelClassName="card-labels",
                     inputClassName="card-inputs",
                     inline=True,
