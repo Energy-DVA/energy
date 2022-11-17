@@ -10,7 +10,7 @@ from utils.constants import (
     OIL_COLOR,
     GAS_COLOR,
     WELL_COLOR,
-    CUSTOM_MODEBAR
+    CUSTOM_MODEBAR,
 )
 from components.data_manager import DataManager
 
@@ -74,7 +74,15 @@ def generate_plot_title(text):
 
 
 def generate_forecast_with_ci(
-    commodity, x_train, y_train, x_forecast, y_forecast, y_upper, y_lower, well_train, well_forecast
+    commodity,
+    x_train,
+    y_train,
+    x_forecast,
+    y_forecast,
+    y_upper,
+    y_lower,
+    well_train,
+    well_forecast,
 ):
 
     # Define Colors and units
@@ -89,7 +97,7 @@ def generate_forecast_with_ci(
         rows=2,
         cols=1,
         shared_xaxes=True,
-        vertical_spacing=0.02,
+        vertical_spacing=0.01,
     )
 
     # Generate figure
@@ -103,9 +111,9 @@ def generate_forecast_with_ci(
             hovertemplate="Historical Production: %{y}" + f"{units}<br>",
         ),
         row=1,
-        col=1
+        col=1,
     )
-    
+
     fig.add_trace(
         go.Scatter(
             x=x_forecast,
@@ -116,7 +124,7 @@ def generate_forecast_with_ci(
             hovertemplate="Forecasted Production: %{y}" + f"{units}<br>",
         ),
         row=1,
-        col=1
+        col=1,
     )
 
     fig.add_trace(
@@ -131,9 +139,9 @@ def generate_forecast_with_ci(
             hovertemplate="Forecast Upper Bound: %{y}" + f"{units}<br>",
         ),
         row=1,
-        col=1
+        col=1,
     )
-    
+
     fig.add_trace(
         go.Scatter(
             x=x_forecast,
@@ -148,7 +156,7 @@ def generate_forecast_with_ci(
             hovertemplate="Forecast Lower Bound: %{y}" + f"{units}<br>",
         ),
         row=1,
-        col=1
+        col=1,
     )
 
     fig.add_trace(
@@ -161,9 +169,9 @@ def generate_forecast_with_ci(
             hovertemplate="Historical Well Count: %{y}<br>",
         ),
         row=2,
-        col=1
+        col=1,
     )
-    
+
     fig.add_trace(
         go.Scatter(
             x=x_forecast,
@@ -174,56 +182,44 @@ def generate_forecast_with_ci(
             hovertemplate="Forecasted Well Count: %{y}<br>",
         ),
         row=2,
-        col=1
+        col=1,
     )
-    
+
     # Add Vertical Lines
-    fig.add_vline(x=x_forecast.iloc[0], line_width=2, line_dash="dot", line_color="black", row=1, col=1)
-    fig.add_vline(x=x_forecast.iloc[0], line_width=2, line_dash="dot", line_color="black", row=2, col=1)
+    fig.add_vline(
+        x=x_forecast.iloc[0],
+        line_width=2,
+        line_dash="dot",
+        line_color="black",
+        row=1,
+        col=1,
+    )
+    fig.add_vline(
+        x=x_forecast.iloc[0],
+        line_width=2,
+        line_dash="dot",
+        line_color="black",
+        row=2,
+        col=1,
+    )
 
     fig.update_layout(
         yaxis_title=f"{commodity} Production ({units})",
-        title=generate_plot_title(
-                "Commodity Production Forecast and Well Data "
-            ),
+        title=generate_plot_title("Commodity Production Forecast and Well Data "),
         hovermode="x",
         margin={"l": 25, "r": 25, "t": 50, "b": 50},
         modebar=CUSTOM_MODEBAR,
         showlegend=False,
     )
-    
-    # Update X-axes
-    fig.update_xaxes(
-        showgrid=False,
-        row=1,
-        col=1
-    )
-    fig.update_xaxes(
-        title_text="Date",
-        title_standoff=0,
-        row=2,
-        col=1,
-        showgrid=False
-    )
-    # Update all y axes
-    fig.update_yaxes(zeroline=True,
-                     zerolinecolor='black',
-                     zerolinewidth=1
-    )
-    # Update top Y axis
-    fig.update_yaxes(
-        title_text=f"Production ({units})",
-        title_standoff=0,
-        row=1,
-        col=1
-    )
-    # Update bottom Y axis
-    fig.update_yaxes(
-        title_text="Well Count",
-        title_standoff=0,
-        row=2,
-        col=1
-    )
 
+    # Update X-axes
+    fig.update_xaxes(showgrid=False, row=1, col=1)
+    fig.update_xaxes(title_text="Date", title_standoff=0, row=2, col=1, showgrid=False)
+    # Update all y axes
+    fig.update_yaxes(zeroline=True, zerolinecolor="black", zerolinewidth=1)
+    # Update top Y axis
+    fig.update_yaxes(title_text=f"Production ({units})", title_standoff=0, row=1, col=1)
+    # Update bottom Y axis
+    fig.update_yaxes(title_text="Well Count", title_standoff=0, row=2, col=1)
 
     return fig

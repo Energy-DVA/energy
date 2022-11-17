@@ -9,7 +9,7 @@ from utils.constants import (
     CUSTOM_MODEBAR,
     OIL_UNITS,
     GAS_UNITS,
-    WELL_COLOR
+    WELL_COLOR,
 )
 from utils.functions import (
     scatter_commodity,
@@ -196,8 +196,12 @@ def update_plot(commodity, activity, county, operators, selection):
             yaxis_title_prod = f"Production ({units})"
             yaxis_title_wells = "Well Count"
             fig.update_xaxes(title_text=xaxis_title, title_standoff=0, row=2, col=i + 1)
-            fig.update_yaxes(title_text=yaxis_title_prod, title_standoff=0, row=1, col=i + 1)
-            fig.update_yaxes(title_text=yaxis_title_wells, title_standoff=0, row=2, col=i + 1)
+            fig.update_yaxes(
+                title_text=yaxis_title_prod, title_standoff=0, row=1, col=i + 1
+            )
+            fig.update_yaxes(
+                title_text=yaxis_title_wells, title_standoff=0, row=2, col=i + 1
+            )
 
     return fig
 

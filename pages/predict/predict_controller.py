@@ -20,17 +20,23 @@ from utils.functions import log, generate_forecast_with_ci
 
 @app.callback(
     Output("predict-plot", "figure"),
-    Input("commodity", "value"),
+    Input("commodity-radio", "value"),
     prevent_initial_call=False,
 )
 def update_predict_plot(commodity):
+    
+    #############################################
+    # TO REPLACE WITH FORECASTER IN THIS SECTION
     import pandas as pd
-    import numpy as np
 
     # Read data
     df_train = pd.read_csv("pages/predict/xtrain.csv")
     df_valid = pd.read_csv("pages/predict/xvalid.csv")
     df_conf = pd.read_csv("pages/predict/confintx.csv")
+
+    #########################################
+    
+    
     
     # If values go below 0, set it to 0
     df_conf["low"] = df_conf["low"].apply(lambda x: max(0, x))
@@ -48,10 +54,17 @@ def update_predict_plot(commodity):
     y_lower = df_conf["low"].round(0)
     well_train = df_train["N_WELLS"]
     well_forecast = df_valid["N_WELLS"]
-    
-    commodity_type = commodity[0]
-    fig = generate_forecast_with_ci(commodity_type,
-        x_train, y_train, x_forecast, y_forecast, y_upper, y_lower, well_train, well_forecast
+
+    fig = generate_forecast_with_ci(
+        commodity,
+        x_train,
+        y_train,
+        x_forecast,
+        y_forecast,
+        y_upper,
+        y_lower,
+        well_train,
+        well_forecast,
     )
-    
+
     return fig

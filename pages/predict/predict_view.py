@@ -8,13 +8,14 @@ from components.cards import (
     active_card,
     counties_card,
     operators_card,
+    production_radio_card,
 )
 
 from pages.predict.predict_controller import update_predict_plot
 
 sidebar = dbc.Row(
     [
-        dbc.Col(production_card, width=2),
+        dbc.Col(production_radio_card, width=2),
         dbc.Col(counties_card, width=2),
         dbc.Col(operators_card, width=2),
         dbc.Col(active_card),

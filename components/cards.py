@@ -22,6 +22,24 @@ production_card = dbc.Card(
     ],
 )
 
+production_radio_card = dbc.Card(
+    [
+        dbc.CardHeader("Production Type"),
+        dbc.CardBody(
+            [
+                dcc.RadioItems(
+                    id="commodity-radio",
+                    options=["Oil", "Gas"],
+                    value='Oil',
+                    labelClassName="card-labels",
+                    inputClassName="card-inputs",
+                    inline=True,
+                ),
+            ],
+        ),
+    ],
+)
+
 active_card = dbc.Card(
     [
         dbc.CardHeader("Select Years of Activity"),
