@@ -5,13 +5,13 @@ from utils.constants import COUNTIES, YEARS_RANGE
 
 # Declare cards for UI
 instructions = [
-                html.P("Use 'Explore' tab to make selections of data"),
-                html.P("Fill forecast details to the right and watch the magic!")
-            ]
+    html.P("Use 'Explore' tab to make selections of data"),
+    html.P("Fill forecast details to the right and watch the magic!"),
+]
 predict_instructions_card = dbc.Card(
     [
         dbc.CardHeader("Instructions"),
-        dbc.CardBody(html.Ol([html.Li(i) for i in instructions]))
+        dbc.CardBody(html.Ol([html.Li(i) for i in instructions])),
     ],
 )
 
@@ -24,7 +24,7 @@ production_radio_card = dbc.Card(
                 dcc.RadioItems(
                     id="commodity-radio",
                     options=["Oil", "Gas"],
-                    value='Oil',
+                    value="Oil",
                     labelClassName="card-labels",
                     inputClassName="card-inputs",
                     inline=False,
@@ -49,7 +49,7 @@ predict_forecast_time_card = dbc.Card(
                 ),
                 dbc.FormText("Months to Forecast"),
             ],
-        )
+        ),
     ],
 )
 
@@ -69,9 +69,8 @@ predict_forecast_wells_card = dbc.Card(
                                     size="sm",
                                     value=None,
                                     debounce=True,
-                                    ),
+                                ),
                                 dbc.FormText("Num. of Wells"),
-                                
                             ],
                         ),
                         dbc.Col(
@@ -89,25 +88,29 @@ predict_forecast_wells_card = dbc.Card(
                         ),
                         dbc.Col(
                             [
-                                dbc.Button(id='wells-submit-button', n_clicks=0, children='Submit',
-                                           size='sm',
-                                           color="secondary"),
+                                dbc.Button(
+                                    id="wells-submit-button",
+                                    n_clicks=0,
+                                    children="Submit",
+                                    size="sm",
+                                    color="secondary",
+                                ),
                             ],
                         ),
                         dbc.Col(
                             [
                                 dcc.Textarea(
                                     id="forecast-well-input",
-                                    value='',
+                                    value="",
                                     disabled=True,
-                                    className='text-area',
+                                    className="text-area",
                                 ),
                             ],
                         ),
                     ]
                 ),
             ],
-        )
+        ),
     ],
 )
 
@@ -116,11 +119,12 @@ predict_execute_card = dbc.Card(
         dbc.CardHeader("Execute:"),
         dbc.CardBody(
             [
-                dbc.Button(id='forecast-execute-button', 
-                            n_clicks=0, 
-                            children='FORECAST',
-                            size='sm',
-                            color="primary",
+                dbc.Button(
+                    id="forecast-execute-button",
+                    n_clicks=None,
+                    children="FORECAST",
+                    size="sm",
+                    color="primary",
                 )
             ],
         ),

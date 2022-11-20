@@ -15,7 +15,9 @@ from components.cards import (
     predict_execute_card,
 )
 
-from pages.predict.predict_controller import update_predict_plot, store_map_selected_data
+from pages.predict.predict_controller import (
+    update_predict_plot,
+)
 
 sidebar = dbc.Row(
     [

@@ -62,6 +62,8 @@ def update_map(map_type, commodity, activity, county, operators):
     df = dm.get_lease_info(
         cols, None, county, operators, commodity_l, activity
     ).dropna()
+    # Save data frame for later use in data manager
+    dm.df_well_info = df
 
     if map_type == "Heat Map":
         fig.add_trace(
@@ -166,8 +168,16 @@ def update_plot(commodity, activity, county, operators, selection):
             return generate_empty_plot()
         else:
             # Plot the two traces
-            color = OIL_COLOR if commo == "Oil" else GAS_COLOR
-            units = OIL_UNITS if commodity == "Oil" else GAS_UNITS
+            if commo == "Oil":
+                color = OIL_COLOR
+                units = OIL_UNITS
+                dm.df_oil_prod = df
+            elif commo == "Gas":
+                color = GAS_COLOR
+                units = GAS_UNITS
+                dm.df_gas_prod = df
+            else:
+                raise ValueError(f"Unknown commodity: {commo}")
 
             fig.add_trace(
                 go.Scatter(

@@ -33,15 +33,19 @@ class DataManager:
     def __init__(self, db_type: str, path: str):
         self.db_type = db_type
         self.path = path
-        self.engine = create_engine(f"{db_type}://{path}")
+        self._engine = create_engine(f"{db_type}://{path}")
         # Reflect tables
-        self.meta = MetaData()
-        self.meta.reflect(bind=self.engine)
-        self.oil_prod = self.meta.tables[self.OIL_PROD_TABLE]
-        self.gas_prod = self.meta.tables[self.GAS_PROD_TABLE]
-        self.lease = self.meta.tables[self.LEASE_TABLE]
-        self.wells = self.meta.tables[self.WELLS_TABLE]
-        self.tops = self.meta.tables[self.TOPS_TABLE]
+        self._meta = MetaData()
+        self._meta.reflect(bind=self._engine)
+        self._oil_prod = self._meta.tables[self.OIL_PROD_TABLE]
+        self._gas_prod = self._meta.tables[self.GAS_PROD_TABLE]
+        self._lease = self._meta.tables[self.LEASE_TABLE]
+        self._wells = self._meta.tables[self.WELLS_TABLE]
+        self._tops = self._meta.tables[self.TOPS_TABLE]
+        # -- Attributes for caching well and production info
+        self.df_well_info: Optional[pd.DataFrame] = None
+        self.df_oil_prod: Optional[pd.DataFrame] = None
+        self.df_gas_prod: Optional[pd.DataFrame] = None
 
     def _create_conditions_query(
         self,
@@ -54,29 +58,29 @@ class DataManager:
     ):
         # -- Get the columns to select
         if cols is None:
-            s_cols = self.lease
+            s_cols = self._lease
         else:
-            s_cols = [self.lease.c[col] for col in cols]
+            s_cols = [self._lease.c[col] for col in cols]
 
         conditions = []
         # -- Add lease ids
         if lease_ids is not None:
-            conditions.append(self.lease.c[self.L_LEASE_ID].in_(lease_ids))
+            conditions.append(self._lease.c[self.L_LEASE_ID].in_(lease_ids))
         # -- Add counties
         if counties is not None:
-            conditions.append(self.lease.c[self.L_COUNTY].in_(counties))
+            conditions.append(self._lease.c[self.L_COUNTY].in_(counties))
         # -- Add operators
         if operators is not None:
-            conditions.append(self.lease.c[self.L_OPERATOR].in_(operators))
+            conditions.append(self._lease.c[self.L_OPERATOR].in_(operators))
         # -- Add produces
         if produces is not None:
-            conditions.append(self.lease.c[self.L_PRODUCES].in_(produces))
+            conditions.append(self._lease.c[self.L_PRODUCES].in_(produces))
         # -- Add years start
         if years_range is not None:
             conditions.append(
                 and_(
-                    self.lease.c[self.L_YEAR_START] >= years_range[0],
-                    self.lease.c[self.L_YEAR_STOP] <= years_range[1],
+                    self._lease.c[self.L_YEAR_START] >= years_range[0],
+                    self._lease.c[self.L_YEAR_STOP] <= years_range[1],
                 )
             )
 
@@ -103,7 +107,7 @@ class DataManager:
             cols, lease_ids, counties, operators, produces, years_range
         )
 
-        df = pd.read_sql(s, self.engine)
+        df = pd.read_sql(s, self._engine)
 
         return df
 
@@ -121,9 +125,9 @@ class DataManager:
         """Get production for a list of lease ids"""
         # -- Get the table to query
         if prod_type == "oil":
-            table = self.oil_prod
+            table = self._oil_prod
         elif prod_type == "gas":
-            table = self.gas_prod
+            table = self._gas_prod
         else:
             raise ValueError(f"Unknown production type: {prod_type}")
 
@@ -166,7 +170,7 @@ class DataManager:
             .group_by(table.c[self.P_DATE])
         )
 
-        df = pd.read_sql(s, self.engine)
+        df = pd.read_sql(s, self._engine)
 
         if get_rate:
             # Parse date column and set as index and order it
