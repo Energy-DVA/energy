@@ -275,4 +275,4 @@ def update_operators_options(county):
     df_op = df_op.dropna()
     df_op = df_op.drop_duplicates()
     df_op = df_op.sort_values(by=[dm.L_OPERATOR])
-    return [op for op in df_op[dm.L_OPERATOR]]
+    return ["All"] + [op for op in df_op[dm.L_OPERATOR]]
