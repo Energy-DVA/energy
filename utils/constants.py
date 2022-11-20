@@ -13,7 +13,7 @@ CUSTOM_MODEBAR = {
 }
 OIL_COLOR = "rgb(0,200,0)"
 GAS_COLOR = "rgb(200,0,0)"
-WELL_COLOR = "lightseagreen"
+WELL_COLOR = "black"
 WATERMARK = Image.open("components/watermark.png")
 YEARS_RANGE = [1930, 2022]
 

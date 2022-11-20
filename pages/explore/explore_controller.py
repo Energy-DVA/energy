@@ -264,3 +264,15 @@ def filter_based_on_input(county, operators):
             operators = [i for i in operators if i != "All"]
 
     return county, operators
+
+
+@app.callback(
+    Output("operators", "options"),
+    Input("county", "value"),
+)
+def update_operators_options(county):
+    df_op = dm.get_lease_info([dm.L_OPERATOR])
+    df_op = df_op.dropna()
+    df_op = df_op.drop_duplicates()
+    df_op = df_op.sort_values(by=[dm.L_OPERATOR])
+    return [op for op in df_op[dm.L_OPERATOR]]
