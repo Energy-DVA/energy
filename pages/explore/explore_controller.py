@@ -57,6 +57,7 @@ def update_map(map_type, commodity, activity, county, operators):
         dm.L_YEAR_START,
         dm.L_YEAR_STOP,
         dm.L_COUNTY,
+        dm.L_OPERATOR,
     ]
     commodity_l = [x.upper() for x in commodity]
     df = dm.get_lease_info(
@@ -73,7 +74,7 @@ def update_map(map_type, commodity, activity, county, operators):
                 text=df[dm.L_COUNTY],
                 radius=2,
                 showscale=False,
-                hovertemplate="<b>County</b><br>" + "%{text}<br>" + "<extra></extra>",
+                hovertemplate="<b>County: %{text}<br><extra></extra>",
             )
         )
     elif map_type == "Scatter Plot":

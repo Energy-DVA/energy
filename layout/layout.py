@@ -13,6 +13,7 @@ layout = html.Div(
             [
                 dbc.Col(title, width="auto", className="website-title"),
                 dbc.Col(tabs),
+                #dbc.Col(html.Img(src='assets/dva_team_logo.png', style={'height':'10%'}), width=1),
             ],
         ),
         dbc.Container(

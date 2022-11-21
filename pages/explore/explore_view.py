@@ -107,4 +107,46 @@ layout = [
             ),
         ]
     ),
+    html.Br(),
+    dbc.CardGroup(
+        [
+            dbc.Card(
+                [
+                    dbc.CardHeader("Kansas State Map"),
+                    dbc.CardBody(
+                        [
+                            dbc.Row(
+                                dcc.Loading(
+                                    dcc.Graph(
+                                        id="dfadfadfadf",
+                                        figure=draw_base_map(),
+                                        config=map_config,
+                                        style={"padding-top": "1%"},
+                                    ),
+                                    id="loading-1",
+                                    type="default",
+                                )
+                            ),
+                        ]
+                    ),
+                ]
+            ),
+            dbc.Card(
+                [
+                    dbc.CardHeader("Historical Production Plots"),
+                    dbc.CardBody(
+                        dcc.Loading(
+                            dcc.Graph(
+                                id="yutitusdsdf",
+                                figure=go.Figure(),
+                                style={"padding-top": "3%"},
+                            ),
+                            id="loading-1",
+                            type="default",
+                        ),
+                    ),
+                ],
+            ),
+        ]
+    ),
 ]

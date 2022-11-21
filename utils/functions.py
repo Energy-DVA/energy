@@ -1,5 +1,6 @@
 from app import app
 import plotly.graph_objects as go
+import numpy as np
 import pandas as pd
 from plotly.subplots import make_subplots
 
@@ -31,13 +32,13 @@ def scatter_commodity(df: pd.DataFrame, dm: DataManager, color: str, title: str)
             opacity=0.6,
         ),
         text=df[dm.L_LEASE_ID],
-        customdata=df[dm.L_COUNTY],
+        customdata= np.stack([df[dm.L_COUNTY], df[dm.L_OPERATOR]], axis=-1),
         showlegend=True,
         legendgroup="scatter" + title,
         name=title,
-        hovertemplate="<b>County</b><br>"
-        + "%{customdata}<br>"
-        + "%{text}<br>"
+        hovertemplate="<b>County: %{customdata[0]}<br>"
+        + "<b> Lease ID: #%{text}<br>"
+        + "<b> Operator: %{customdata[1]}<br>"
         + "<extra></extra>",
     )
 
