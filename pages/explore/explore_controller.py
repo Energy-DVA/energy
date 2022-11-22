@@ -244,9 +244,9 @@ def update_top_bargraphs(commodity, activity, county, operators, selection):
     lease_ids = None
     if callback_context.triggered_id == "map":
         if selection is not None and len(selection["points"]) > 0:
-            lease_ids = [int(pt["text"]) for pt in selection["points"]]
-        elif selection is not None and len(selection["points"]) == 0:
-            lease_ids = []
+            county_opers = [x['customdata'] for x in selection["points"]]
+            county = [pair[0] for pair in county_opers]
+            operators = [pair[1] for pair in county_opers]
 
     # Retrieve Data
     cols = [
