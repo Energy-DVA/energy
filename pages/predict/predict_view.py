@@ -25,7 +25,12 @@ sidebar = dbc.Row(
         dbc.Col(production_radio_card, width=1),
         #dbc.Col(predict_forecast_time_card, width=1),
         dbc.Col(predict_forecast_wells_card, width='auto'),
-        dbc.Col(predict_execute_card, width='auto'),
+        dbc.Col(
+            [
+                predict_execute_card,
+                dbc.FormText("Try me!")
+            ],
+            width='auto'),
     ],
 )
 

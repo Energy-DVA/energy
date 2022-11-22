@@ -107,7 +107,7 @@ predict_forecast_wells_card = dbc.Card(
                                     value="Number of Wells, Months",
                                     disabled=True,
                                     className="text-area",
-                                    style={'resize':'none','width':'100%', 'padding-left':'0.5vw'}
+                                    style={'resize':'vertical','width':'100%', 'padding-left':'0.5vw'}
                                 ),
                             ],
                             width='auto',
