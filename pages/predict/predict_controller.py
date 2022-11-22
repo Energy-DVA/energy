@@ -41,13 +41,14 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
     inputs = forecast_input.splitlines()
     header = ['wells','months']
     if len(inputs) > 1:
-        vals = [[x.split(',')[0],x.split(',')[1]] for x in inputs[1:]]
+        vals = [[int(x.split(',')[0]),int(x.split(',')[1])] for x in inputs[1:]]
     else:
         vals = []
     df_user = pd.DataFrame(vals, columns=header)
         
-    if n_clicks is None:
-        raise PreventUpdate
+    # if n_clicks is None:
+    #     raise PreventUpdate
+    
     #############################################
     # TO REPLACE WITH FORECASTER IN THIS SECTION
     if commodity == "Oil":
@@ -59,9 +60,21 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
     else:
         return ValueError("Invalid commodity")
 
+    # Set Defaults
     n_wells = 9000
-    pred_period = 36
-    wells_arr = pd.DataFrame([n_wells] * pred_period)  # TO REPLACE WITH INPUT
+    pred_period = 1 if n_clicks == None else 36 
+    wells_arr = pd.DataFrame([n_wells] * pred_period)
+    
+    # Override defaults with user inputs
+    if len(df_user) > 0:
+        pred_period = int(df_user['months'].sum())
+        wells_arr = []
+        for row in df_user.itertuples():
+            print(row)
+            wells_arr += [int(row.wells)] * int(row.months)
+        wells_arr = pd.DataFrame(wells_arr)
+    
+    # Fit Forecaster
     fc = Forecaster(y, X)
     df_results = fc.fit_predict(pred_period, wells_arr)
     #########################################
