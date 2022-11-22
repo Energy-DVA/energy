@@ -6,7 +6,7 @@ from utils.constants import COUNTIES, YEARS_RANGE
 # Declare cards for UI
 instructions = [
     html.P("Use 'Explore' tab to make selections of data"),
-    html.P("Fill forecast details to the right and watch the magic!"),
+    html.P("Fill forecast inputs required on the right"),
 ]
 predict_instructions_card = dbc.Card(
     [
@@ -72,6 +72,7 @@ predict_forecast_wells_card = dbc.Card(
                                 ),
                                 dbc.FormText("Num. of Wells"),
                             ],
+                            width=3
                         ),
                         dbc.Col(
                             [
@@ -85,27 +86,44 @@ predict_forecast_wells_card = dbc.Card(
                                 ),
                                 dbc.FormText("for time period (months)"),
                             ],
+                            width=3
                         ),
                         dbc.Col(
                             [
                                 dbc.Button(
                                     id="wells-submit-button",
                                     n_clicks=0,
-                                    children="Submit",
+                                    children="Append \u21a6",
                                     size="sm",
                                     color="secondary",
                                 ),
                             ],
+                            width='auto'
                         ),
                         dbc.Col(
                             [
                                 dcc.Textarea(
                                     id="forecast-well-input",
-                                    value="Number of Wells, Duration (months)",
+                                    value="Number of Wells, Months",
                                     disabled=True,
                                     className="text-area",
+                                    style={'resize':'none','width':'100%', 'padding-left':'0.5vw'}
                                 ),
                             ],
+                            width='auto',
+                            
+                        ),
+                        dbc.Col(
+                            [
+                                dbc.Button(
+                                    id="clear-input-button",
+                                    n_clicks=0,
+                                    children="\u21a4 Clear",
+                                    size="sm",
+                                    color="secondary",
+                                ),
+                            ],
+                            width='auto'
                         ),
                     ]
                 ),

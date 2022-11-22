@@ -11,25 +11,30 @@ from utils.functions import log, generate_forecast_with_ci
 @app.callback(
     Output("forecast-well-input", "value"),
     Input("wells-submit-button", "n_clicks"),
+    Input("clear-input-button", "n_clicks"),
     State("predict-wells-month", "value"),
     State("predict-wells", "value"),
     State("forecast-well-input", "value"),
     prevent_initial_call=False,
 )
-def update_user_input_to_textbox(submit_click, well_months, num_wells, current_value):
-    if num_wells == None or well_months == None or num_wells == '' or well_months == '':
-        return current_value
+def update_user_input_to_textbox(submit_click, clear_click, well_months, num_wells, current_value):
+    if callback_context.triggered_id == "clear-input-button":
+        return "Number of Wells, Months"
     else:
-        return current_value + '\n' + f"{num_wells},{well_months}"
-
+        if num_wells == None or well_months == None or num_wells == '' or well_months == '':
+            return current_value
+        else:
+            return current_value + '\n' + f"{num_wells},{well_months}"
+        
 
 @app.callback(
     Output("predict-plot", "figure"),
     Input("forecast-execute-button", "n_clicks"),
     State("commodity-radio", "value"),
-    prevent_initial_call=False,
+    State("forecast-well-input", "value"),
+    #prevent_initial_call=False,
 )
-def update_predict_plot(n_clicks, commodity):
+def update_predict_plot(n_clicks, commodity, forecast_input):
     if n_clicks is None:
         raise PreventUpdate
     #############################################
@@ -42,6 +47,9 @@ def update_predict_plot(n_clicks, commodity):
         X = dm.df_gas_prod[[dm.P_WELLS]]
     else:
         return ValueError("Invalid commodity")
+
+    df_user = pd.DataFrame(forecast_input)
+    print(df_user)
 
     n_wells = 9000
     pred_period = 36
@@ -84,3 +92,5 @@ def update_predict_plot(n_clicks, commodity):
     )
 
     return fig
+
+
