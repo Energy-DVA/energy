@@ -1,7 +1,9 @@
 from app import app
+import pandas as pd
 from dash import callback_context
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
+import plotly.express as px
 from plotly.subplots import make_subplots
 from utils.constants import (
     OIL_COLOR,
@@ -63,8 +65,6 @@ def update_map(map_type, commodity, activity, county, operators):
     df = dm.get_lease_info(
         cols, None, county, operators, commodity_l, activity
     ).dropna()
-    # Save data frame for later use in data manager
-    dm.df_well_info = df
 
     if map_type == "Heat Map":
         fig.add_trace(
@@ -215,6 +215,185 @@ def update_plot(commodity, activity, county, operators, selection):
             )
 
     return fig
+
+
+@app.callback(
+    Output("top-prod-counties", "figure"),
+    Output("top-prod-operators", "figure"),
+    Input("commodity", "value"),
+    Input("year-slider", "value"),
+    Input("county", "value"),
+    Input("operators", "value"),
+    Input("map", "selectedData"),
+    prevent_initial_call=False,
+)
+def update_top_bargraphs(commodity, activity, county, operators, selection):
+    # Handle error
+    if len(commodity) == 0:
+        return go.Figure(), go.Figure()
+
+    # Set flags
+    if county == [] or county == ["All"]:
+        county = None
+    if operators == [] or operators == ["All"]:
+        operators = None
+
+    # Check if map selection triggered callback
+    # If yes, retrieve selection leases
+    # If selection is empty, do nothing and return original figure
+    lease_ids = None
+    if callback_context.triggered_id == "map":
+        if selection is not None and len(selection["points"]) > 0:
+            lease_ids = [int(pt["text"]) for pt in selection["points"]]
+        elif selection is not None and len(selection["points"]) == 0:
+            lease_ids = []
+
+    # Retrieve Data
+    cols = [
+        dm.L_COUNTY,
+        dm.L_OPERATOR,
+        dm.L_PRODUCES,
+        dm.P_PRODUCTION,
+    ]
+    commodity_l = [x.upper() for x in commodity]
+    df = dm.get_lease_info(
+        cols, None, county, operators, commodity_l, activity
+    ).dropna()
+
+    # Get top 5 counties
+    df_counties = df[['PRODUCES','COUNTY','PRODUCTION']] \
+                    .groupby(['PRODUCES','COUNTY']).sum()['PRODUCTION'] \
+                    .reset_index() \
+                    .sort_values(by='PRODUCTION', ascending=False) \
+                    .groupby('PRODUCES') \
+                    .head(5).round(0)
+                    
+    # Get top 5 Operators
+    df_operators = df[['PRODUCES','OPERATOR','PRODUCTION']] \
+                    .groupby(['PRODUCES','OPERATOR']).sum()['PRODUCTION'] \
+                    .reset_index() \
+                    .sort_values(by='PRODUCTION', ascending=False) \
+                    .groupby('PRODUCES') \
+                    .head(5).round(0)
+    df_operators['TRUNCATED_NAME'] = df_operators['OPERATOR'].apply(lambda x: x[:7]+'...')
+    
+    # Develop plot
+    fig_counties = make_subplots(
+        rows=1,
+        cols=max(1, len(commodity)),
+        column_titles=[f"{commo} Leases" for commo in commodity],
+        horizontal_spacing=0.05,
+    )
+    
+    fig_operators = make_subplots(
+        rows=1,
+        cols=max(1, len(commodity)),
+        column_titles=[f"{commo} Leases" for commo in commodity],
+        horizontal_spacing=0.05,
+    )
+    
+    for i, commo in enumerate(commodity):
+        redgrad = ['rgb(203,24,29)', 'rgb(239,59,44)', 'rgb(251,106,74)', 'rgb(252,146,114)', 'rgb(252,187,161)']
+        greengrad = ['rgb(35,139,69)', 'rgb(65,171,93)', 'rgb(116,196,118)', 'rgb(161,217,155)', 'rgb(199,233,192)']
+        clrscle = redgrad if commo=='Gas' else greengrad
+        
+        # Add county traces
+        traces_counties = px.bar(df_counties[df_counties['PRODUCES']==commo.upper()], 
+                                x='PRODUCES',
+                                y="PRODUCTION",
+                                text='COUNTY',
+                                color='COUNTY',
+                                hover_data={'COUNTY':True,'PRODUCTION':True,'PRODUCES':False, 'PRODUCES':False},
+                                barmode="overlay",
+                                color_discrete_sequence=clrscle).data
+        for trace in traces_counties:        
+            fig_counties.add_trace(
+                trace,
+                row=1,
+                col=i+1,
+            )
+            
+        # Add operator traces
+        traces_operators = px.bar(df_operators[df_operators['PRODUCES']==commo.upper()], 
+                                x='PRODUCES',
+                                y="PRODUCTION",
+                                text='TRUNCATED_NAME',
+                                hover_name='OPERATOR',
+                                hover_data={'OPERATOR':True,'PRODUCTION':True,'TRUNCATED_NAME':False,'PRODUCES':False},
+                                color='OPERATOR',
+                                barmode="overlay",
+                                color_discrete_sequence=clrscle).data
+        for trace in traces_operators:
+            fig_operators.add_trace(
+                trace,
+                row=1,
+                col=i+1,
+            )
+        
+        units = OIL_UNITS if commo == "Oil" else GAS_UNITS
+        yaxis_title = f"Production ({units})"
+        side = 'right' if i>0 else 'left'
+        
+        # Update County figure
+        fig_counties.update_yaxes(
+            title_text=yaxis_title, 
+            side=side,
+            title_standoff=1,
+            gridcolor='grey',
+            griddash='dash',
+            gridwidth=0.1,
+            showline=True,
+            linewidth=2,
+            linecolor='black',
+            mirror=True,
+            row=1, 
+            col=i + 1,
+        )
+        fig_counties.update_xaxes(showline=True, linewidth=2, linecolor='black', mirror=True, gridwidth=0.5)
+        
+        # Update Operator figure
+        fig_operators.update_yaxes(
+            title_text=yaxis_title, 
+            side=side,
+            title_standoff=1,
+            gridcolor='grey',
+            griddash='dash',
+            gridwidth=0.1,
+            showline=True,
+            linewidth=2,
+            linecolor='black',
+            mirror=True,
+            row=1, 
+            col=i + 1,
+        )
+        fig_operators.update_xaxes(showline=True, linewidth=2, linecolor='black', mirror=True, gridwidth=0.5)
+        
+    
+    fig_counties.update_traces(textangle=0, textfont={'color':'black'})
+    fig_operators.update_traces(textangle=0, textfont={'color':'black'})
+
+    fig_counties.update_layout(
+        #barmode='group',
+        showlegend=False,
+        #title=generate_plot_title("Top 5 Counties"),
+        margin={"l": 35, "r": 35, "t": 25, "b": 5},
+        modebar=CUSTOM_MODEBAR,
+        autosize=True,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
+    fig_operators.update_layout(
+        #barmode='group',
+        showlegend=False,
+        #title=generate_plot_title("Top 5 Counties"),
+        margin={"l": 35, "r": 35, "t": 25, "b": 5},
+        modebar=CUSTOM_MODEBAR,
+        autosize=True,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
+    
+    return fig_counties, fig_operators
 
 
 @app.callback(

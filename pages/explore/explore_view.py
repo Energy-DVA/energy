@@ -112,15 +112,14 @@ layout = [
         [
             dbc.Card(
                 [
-                    dbc.CardHeader("Kansas State Map"),
+                    dbc.CardHeader("Top 5 Producing Counties in Selection"),
                     dbc.CardBody(
                         [
                             dbc.Row(
                                 dcc.Loading(
                                     dcc.Graph(
-                                        id="dfadfadfadf",
+                                        id="top-prod-counties",
                                         figure=draw_base_map(),
-                                        config=map_config,
                                         style={"padding-top": "1%"},
                                     ),
                                     id="loading-1",
@@ -133,13 +132,13 @@ layout = [
             ),
             dbc.Card(
                 [
-                    dbc.CardHeader("Historical Production Plots"),
+                    dbc.CardHeader("Top 5 Producing Operators in Selection"),
                     dbc.CardBody(
                         dcc.Loading(
                             dcc.Graph(
-                                id="yutitusdsdf",
+                                id="top-prod-operators",
                                 figure=go.Figure(),
-                                style={"padding-top": "3%"},
+                                style={"padding-top": "1%"},
                             ),
                             id="loading-1",
                             type="default",
