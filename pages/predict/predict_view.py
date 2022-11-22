@@ -21,11 +21,11 @@ from pages.predict.predict_controller import (
 
 sidebar = dbc.Row(
     [
-        dbc.Col(predict_instructions_card, width=4),
+        dbc.Col(predict_instructions_card, width=3),
         dbc.Col(production_radio_card, width=1),
         #dbc.Col(predict_forecast_time_card, width=1),
         dbc.Col(predict_forecast_wells_card, width='auto'),
-        dbc.Col(predict_execute_card, width=1),
+        dbc.Col(predict_execute_card, width='auto'),
     ],
 )
 
