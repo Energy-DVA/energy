@@ -101,7 +101,7 @@ predict_forecast_wells_card = dbc.Card(
                             [
                                 dcc.Textarea(
                                     id="forecast-well-input",
-                                    value="",
+                                    value="Number of Wells, Duration (months)",
                                     disabled=True,
                                     className="text-area",
                                 ),

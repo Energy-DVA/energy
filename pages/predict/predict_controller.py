@@ -9,6 +9,21 @@ from utils.functions import log, generate_forecast_with_ci
 
 
 @app.callback(
+    Output("forecast-well-input", "value"),
+    Input("wells-submit-button", "n_clicks"),
+    State("predict-wells-month", "value"),
+    State("predict-wells", "value"),
+    State("forecast-well-input", "value"),
+    prevent_initial_call=False,
+)
+def update_user_input_to_textbox(submit_click, well_months, num_wells, current_value):
+    if num_wells == None or well_months == None or num_wells == '' or well_months == '':
+        return current_value
+    else:
+        return current_value + '\n' + f"{num_wells},{well_months}"
+
+
+@app.callback(
     Output("predict-plot", "figure"),
     Input("forecast-execute-button", "n_clicks"),
     State("commodity-radio", "value"),
