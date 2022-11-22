@@ -3,6 +3,7 @@ from dash import callback_context
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 import pandas as pd
+import plotly.graph_objects as go
 from pages.explore.explore_model import dm
 from components.forecaster import Forecaster
 from utils.functions import log, generate_forecast_with_ci
@@ -35,6 +36,16 @@ def update_user_input_to_textbox(submit_click, clear_click, well_months, num_wel
     #prevent_initial_call=False,
 )
 def update_predict_plot(n_clicks, commodity, forecast_input):
+    
+    # Convert input to DataFrame
+    inputs = forecast_input.splitlines()
+    header = ['wells','months']
+    if len(inputs) > 1:
+        vals = [[x.split(',')[0],x.split(',')[1]] for x in inputs[1:]]
+    else:
+        vals = []
+    df_user = pd.DataFrame(vals, columns=header)
+        
     if n_clicks is None:
         raise PreventUpdate
     #############################################
@@ -47,9 +58,6 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
         X = dm.df_gas_prod[[dm.P_WELLS]]
     else:
         return ValueError("Invalid commodity")
-
-    df_user = pd.DataFrame(forecast_input)
-    print(df_user)
 
     n_wells = 9000
     pred_period = 36
