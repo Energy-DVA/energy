@@ -247,9 +247,11 @@ def update_top_bargraphs(commodity, activity, county, operators, selection):
             county_opers = [x['customdata'] for x in selection["points"]]
             county = [pair[0] for pair in county_opers]
             operators = [pair[1] for pair in county_opers]
+            lease_ids = [int(pt["text"]) for pt in selection["points"]]
 
     # Retrieve Data
     cols = [
+        dm.L_LEASE_ID,
         dm.L_COUNTY,
         dm.L_OPERATOR,
         dm.L_PRODUCES,
@@ -257,7 +259,7 @@ def update_top_bargraphs(commodity, activity, county, operators, selection):
     ]
     commodity_l = [x.upper() for x in commodity]
     df = dm.get_lease_info(
-        cols, None, county, operators, commodity_l, activity
+        cols, lease_ids, county, operators, commodity_l, activity
     ).dropna()
 
     # Get top 5 counties
@@ -275,7 +277,7 @@ def update_top_bargraphs(commodity, activity, county, operators, selection):
                     .sort_values(by='PRODUCTION', ascending=False) \
                     .groupby('PRODUCES') \
                     .head(5).round(0)
-    df_operators['TRUNCATED_NAME'] = df_operators['OPERATOR'].apply(lambda x: x[:7]+'...')
+    df_operators['TRUNCATED_NAME'] = df_operators['OPERATOR'].apply(lambda x: x[:6]+'...')
     
     # Develop plot
     fig_counties = make_subplots(
