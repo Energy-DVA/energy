@@ -43,9 +43,6 @@ layout = [
                                 dcc.Loading(
                                     dcc.Graph(
                                         id="predict-plot",
-                                        figure=update_predict_plot(
-                                            None, None, "wells,months\n"
-                                        ),
                                         style={"padding-top": "1%"},
                                     ),
                                     id="loading-1",
