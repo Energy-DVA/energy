@@ -8,7 +8,12 @@ logo_card = dbc.Card(
     [
         dbc.CardImg(src="/assets/dva_team_logo.png", top=True),
     ],
-    style={"height": "10vh", "padding-top":'10%',"padding-left":'10%', 'border':'0'}
+    style={
+        "height": "10vh",
+        "padding-top": "10%",
+        "padding-left": "10%",
+        "border": "0",
+    },
 )
 
 instructions = [
@@ -79,7 +84,7 @@ predict_forecast_wells_card = dbc.Card(
                                 ),
                                 dbc.FormText("Num. of Wells"),
                             ],
-                            width=3
+                            width=3,
                         ),
                         dbc.Col(
                             [
@@ -93,7 +98,7 @@ predict_forecast_wells_card = dbc.Card(
                                 ),
                                 dbc.FormText("for time period (months)"),
                             ],
-                            width=3
+                            width=3,
                         ),
                         dbc.Col(
                             [
@@ -105,7 +110,7 @@ predict_forecast_wells_card = dbc.Card(
                                     color="secondary",
                                 ),
                             ],
-                            width='auto'
+                            width="auto",
                         ),
                         dbc.Col(
                             [
@@ -114,11 +119,14 @@ predict_forecast_wells_card = dbc.Card(
                                     value="Number of Wells, Months",
                                     disabled=True,
                                     className="text-area",
-                                    style={'resize':'vertical','width':'100%', 'padding-left':'0.5vw'}
+                                    style={
+                                        "resize": "vertical",
+                                        "width": "100%",
+                                        "padding-left": "0.5vw",
+                                    },
                                 ),
                             ],
-                            width='auto',
-                            
+                            width="auto",
                         ),
                         dbc.Col(
                             [
@@ -130,7 +138,7 @@ predict_forecast_wells_card = dbc.Card(
                                     color="secondary",
                                 ),
                             ],
-                            width='auto'
+                            width="auto",
                         ),
                     ]
                 ),

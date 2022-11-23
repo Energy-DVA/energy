@@ -8,6 +8,7 @@ from sqlalchemy import (
     Date,
 )
 from sqlalchemy import create_engine
+
 #%% Table names
 OIL_PROD_TABLE = "oil_production"
 GAS_PROD_TABLE = "gas_production"
@@ -150,6 +151,3 @@ tops = Table(
     Column("UPDATED", Date),
     Column("OLD_FORMATION", String),
 )
-
-
-

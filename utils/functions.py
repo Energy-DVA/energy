@@ -32,7 +32,7 @@ def scatter_commodity(df: pd.DataFrame, dm: DataManager, color: str, title: str)
             opacity=0.6,
         ),
         text=df[dm.L_LEASE_ID],
-        customdata= np.stack([df[dm.L_COUNTY], df[dm.L_OPERATOR]], axis=-1),
+        customdata=np.stack([df[dm.L_COUNTY], df[dm.L_OPERATOR]], axis=-1),
         showlegend=True,
         legendgroup="scatter" + title,
         name=title,
@@ -113,7 +113,7 @@ def generate_forecast_with_ci(
         row=1,
         col=1,
     )
-    
+
     fig.add_trace(
         go.Scatter(
             x=x_train,

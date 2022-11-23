@@ -1,36 +1,25 @@
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-import plotly.graph_objects as go
 
 from utils.constants import COUNTIES
 from components.cards import (
-    production_card,
-    active_card,
-    counties_card,
-    operators_card,
     production_radio_card,
     predict_instructions_card,
-    predict_forecast_time_card,
     predict_forecast_wells_card,
     predict_execute_card,
 )
 
 from pages.predict.predict_controller import (
     update_predict_plot,
+    update_user_input_to_textbox,
 )
 
 sidebar = dbc.Row(
     [
         dbc.Col(predict_instructions_card, width=3),
         dbc.Col(production_radio_card, width=1),
-        #dbc.Col(predict_forecast_time_card, width=1),
-        dbc.Col(predict_forecast_wells_card, width='auto'),
-        dbc.Col(
-            [
-                predict_execute_card,
-                dbc.FormText("Try me!")
-            ],
-            width='auto'),
+        dbc.Col(predict_forecast_wells_card, width="auto"),
+        dbc.Col([predict_execute_card, dbc.FormText("Try me!")], width="auto"),
     ],
 )
 
@@ -71,8 +60,8 @@ layout = [
                             icon="primary",
                             dismissable=False,
                             is_open=True,
-                            class_name='toast-body',
-                            header_class_name='toast-header',
+                            class_name="toast-body",
+                            header_class_name="toast-header",
                         ),
                     ),
                     html.Br(),
@@ -84,8 +73,8 @@ layout = [
                             icon="dark",
                             dismissable=False,
                             is_open=True,
-                            class_name='toast-body',
-                            header_class_name='toast-header',
+                            class_name="toast-body",
+                            header_class_name="toast-header",
                         ),
                     ),
                     html.Br(),
@@ -97,8 +86,8 @@ layout = [
                             icon="primary",
                             dismissable=False,
                             is_open=True,
-                            class_name='toast-body',
-                            header_class_name='toast-header',
+                            class_name="toast-body",
+                            header_class_name="toast-header",
                         ),
                     ),
                     html.Br(),
@@ -110,13 +99,13 @@ layout = [
                             icon="secondary",
                             dismissable=False,
                             is_open=True,
-                            class_name='toast-body',
-                            header_class_name='toast-header',
+                            class_name="toast-body",
+                            header_class_name="toast-header",
                         ),
                     ),
                 ],
-                width='auto'
-            )
+                width="auto",
+            ),
         ]
     ),
 ]

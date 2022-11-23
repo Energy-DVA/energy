@@ -19,7 +19,9 @@ def preprocess_prod(df_prod, id_col, date_col, wells_col, prod_col):
     yearly_dates = df_prod[date_col].str.startswith("0")
     df_year = df_prod[yearly_dates]
     if len(df_year) > 0:
-        df_year = df_year.assign(**{date_col: df_year[date_col].str.replace("0", "1", 1)})
+        df_year = df_year.assign(
+            **{date_col: df_year[date_col].str.replace("0", "1", 1)}
+        )
         df_year = (
             df_year.assign(**{date_col: pd.to_datetime(df_year[date_col])})
             .apply(convert_month_year, axis=1, args=(date_col, prod_col))
