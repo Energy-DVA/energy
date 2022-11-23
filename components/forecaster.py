@@ -25,7 +25,7 @@ class Forecaster:
 
     def __init__(
         self,
-        y: pd.Series,
+        y: pd.Series = None,
         X: Optional[Union[pd.Series, pd.DataFrame, list]] = None,
     ):
         """

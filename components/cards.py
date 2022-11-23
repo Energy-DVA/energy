@@ -24,7 +24,7 @@ production_radio_card = dbc.Card(
                 dcc.RadioItems(
                     id="commodity-radio",
                     options=["Oil", "Gas"],
-                    value="Oil",
+                    value=None,
                     labelClassName="card-labels",
                     inputClassName="card-inputs",
                     inline=False,
