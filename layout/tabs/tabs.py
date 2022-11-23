@@ -22,13 +22,13 @@ tabs = html.Div(
                 className="custom-tab",
                 selected_className="custom-tab--selected",
             ),
-            dcc.Tab(
-                label="Compare",
-                value="page_compare",
-                id="page-compare",
-                className="custom-tab",
-                selected_className="custom-tab--selected",
-            ),
+            # dcc.Tab(
+            #     label="Compare",
+            #     value="page_compare",
+            #     id="page-compare",
+            #     className="custom-tab",
+            #     selected_className="custom-tab--selected",
+            # ),
         ],
     )
 )

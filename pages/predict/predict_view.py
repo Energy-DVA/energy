@@ -37,27 +37,86 @@ sidebar = dbc.Row(
 
 layout = [
     html.Br(),
-    dbc.CardGroup(
+    dbc.Row(
         [
-            dbc.Card(
-                [
-                    dbc.CardHeader("Production Forecasting"),
-                    dbc.CardBody(
-                        [
-                            dbc.Row(
-                                dcc.Loading(
-                                    dcc.Graph(
-                                        id="predict-plot",
-                                        style={"padding-top": "1%"},
-                                    ),
-                                    id="loading-1",
-                                    type="default",
-                                )
-                            ),
-                        ]
-                    ),
-                ]
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader("Production Forecasting"),
+                        dbc.CardBody(
+                            [
+                                dbc.Row(
+                                    dcc.Loading(
+                                        dcc.Graph(
+                                            id="predict-plot",
+                                            style={"padding-top": "1%"},
+                                        ),
+                                        id="loading-1",
+                                        type="default",
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+                width=9,
             ),
+            dbc.Col(
+                [
+                    dbc.Row(
+                        dbc.Toast(
+                            children="No Selection Made",
+                            id="toast-hist-prod",
+                            header="Average Historical Production",
+                            icon="primary",
+                            dismissable=False,
+                            is_open=True,
+                            class_name='toast-body',
+                            header_class_name='toast-header',
+                        ),
+                    ),
+                    html.Br(),
+                    dbc.Row(
+                        dbc.Toast(
+                            children="No Selection Made",
+                            id="toast-hist-wells",
+                            header="Average Historical Wells",
+                            icon="dark",
+                            dismissable=False,
+                            is_open=True,
+                            class_name='toast-body',
+                            header_class_name='toast-header',
+                        ),
+                    ),
+                    html.Br(),
+                    dbc.Row(
+                        dbc.Toast(
+                            children="No Selection Made",
+                            id="toast-fore-prod",
+                            header="Average Forecast Production",
+                            icon="primary",
+                            dismissable=False,
+                            is_open=True,
+                            class_name='toast-body',
+                            header_class_name='toast-header',
+                        ),
+                    ),
+                    html.Br(),
+                    dbc.Row(
+                        dbc.Toast(
+                            children="No Selection Made",
+                            id="toast-fore-wells",
+                            header="Average Forecast Wells",
+                            icon="secondary",
+                            dismissable=False,
+                            is_open=True,
+                            class_name='toast-body',
+                            header_class_name='toast-header',
+                        ),
+                    ),
+                ],
+                width='auto'
+            )
         ]
     ),
 ]
