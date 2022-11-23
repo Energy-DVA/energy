@@ -65,43 +65,57 @@ layout = [
                 [
                     dbc.Row(
                         dbc.Toast(
-                            [
-                                html.P("This is the content of the toast", className="mb-0")
-                            ],
-                            id="simple-toast",
-                            header="This is the header",
+                            children="No Selection Made",
+                            id="toast-hist-prod",
+                            header="Average Historical Production",
                             icon="primary",
                             dismissable=False,
                             is_open=True,
+                            class_name='toast-body',
+                            header_class_name='toast-header',
                         ),
                     ),
                     html.Br(),
                     dbc.Row(
                         dbc.Toast(
-                            [
-                                html.P("This is the content of the toast", className="mb-0")
-                            ],
-                            id="siadfa",
-                            header="This is the header",
-                            icon="primary",
+                            children="No Selection Made",
+                            id="toast-hist-wells",
+                            header="Average Historical Wells",
+                            icon="dark",
                             dismissable=False,
                             is_open=True,
+                            class_name='toast-body',
+                            header_class_name='toast-header',
                         ),
                     ),
                     html.Br(),
                     dbc.Row(
                         dbc.Toast(
-                            [
-                                html.P("This is the content of the toast", className="mb-0")
-                            ],
-                            id="simadfast",
-                            header="This is the header",
+                            children="No Selection Made",
+                            id="toast-fore-prod",
+                            header="Average Forecast Production",
                             icon="primary",
                             dismissable=False,
                             is_open=True,
+                            class_name='toast-body',
+                            header_class_name='toast-header',
+                        ),
+                    ),
+                    html.Br(),
+                    dbc.Row(
+                        dbc.Toast(
+                            children="No Selection Made",
+                            id="toast-fore-wells",
+                            header="Average Forecast Wells",
+                            icon="secondary",
+                            dismissable=False,
+                            is_open=True,
+                            class_name='toast-body',
+                            header_class_name='toast-header',
                         ),
                     ),
                 ],
+                width='auto'
             )
         ]
     ),

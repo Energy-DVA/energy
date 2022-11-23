@@ -13,3 +13,15 @@
 #page-body {
     padding-top : 2vh ;
 }
+
+
+.toast-body {
+    font-weight: 600;
+    font-size: medium;
+    font-stretch:extra-condensed;
+}
+
+.toast-header {
+    font-size: large;
+    font-weight:900;
+}
