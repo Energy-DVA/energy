@@ -18,37 +18,44 @@ from utils.functions import log, generate_forecast_with_ci
     State("forecast-well-input", "value"),
     prevent_initial_call=False,
 )
-def update_user_input_to_textbox(submit_click, clear_click, well_months, num_wells, current_value):
+def update_user_input_to_textbox(
+    submit_click, clear_click, well_months, num_wells, current_value
+):
     if callback_context.triggered_id == "clear-input-button":
         return "Number of Wells, Months"
     else:
-        if num_wells == None or well_months == None or num_wells == '' or well_months == '':
+        if (
+            num_wells is None
+            or well_months is None
+            or num_wells == ""
+            or well_months == ""
+        ):
             return current_value
         else:
-            return current_value + '\n' + f"{num_wells},{well_months}"
-        
+            return current_value + "\n" + f"{num_wells},{well_months}"
+
 
 @app.callback(
     Output("predict-plot", "figure"),
     Input("forecast-execute-button", "n_clicks"),
     State("commodity-radio", "value"),
     State("forecast-well-input", "value"),
-    #prevent_initial_call=False,
+    # prevent_initial_call=False,
 )
 def update_predict_plot(n_clicks, commodity, forecast_input):
-    
+
     # Convert input to DataFrame
     inputs = forecast_input.splitlines()
-    header = ['wells','months']
+    header = ["wells", "months"]
     if len(inputs) > 1:
-        vals = [[int(x.split(',')[0]),int(x.split(',')[1])] for x in inputs[1:]]
+        vals = [[int(x.split(",")[0]), int(x.split(",")[1])] for x in inputs[1:]]
     else:
         vals = []
     df_user = pd.DataFrame(vals, columns=header)
-        
-    # if n_clicks is None:
-    #     raise PreventUpdate
-    
+
+    if n_clicks is None:
+        raise PreventUpdate
+
     #############################################
     # TO REPLACE WITH FORECASTER IN THIS SECTION
     if commodity == "Oil":
@@ -62,18 +69,17 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
 
     # Set Defaults
     n_wells = 9000
-    pred_period = 1 if n_clicks == None else 36 
+    pred_period = 1 if n_clicks is None else 36
     wells_arr = pd.DataFrame([n_wells] * pred_period)
-    
+
     # Override defaults with user inputs
     if len(df_user) > 0:
-        pred_period = int(df_user['months'].sum())
+        pred_period = int(df_user["months"].sum())
         wells_arr = []
         for row in df_user.itertuples():
-            print(row)
             wells_arr += [int(row.wells)] * int(row.months)
         wells_arr = pd.DataFrame(wells_arr)
-    
+
     # Fit Forecaster
     fc = Forecaster(y, X)
     df_results = fc.fit_predict(pred_period, wells_arr)
@@ -89,7 +95,7 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
 
     # To ensure connectivity on graph, append last value from train to forecast
     y = pd.concat([y, df_results[fc.RES_FORECAST].iloc[0:1]])
-
+    X.loc[df_results.index[0], dm.P_WELLS] = wells_arr.iloc[0, 0]
     # Define sets and plot the figure
     x_train = pd.Series(y.index)
     x_forecast = pd.Series(df_results.index)
@@ -113,5 +119,3 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
     )
 
     return fig
-
-
