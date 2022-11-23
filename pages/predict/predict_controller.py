@@ -51,12 +51,13 @@ def update_user_input_to_textbox(
     Output("toast-fore-prod", "children"),
     Output("toast-fore-wells", "children"),
     Output("predict-plot", "figure"),
+    Input("toast-hist-prod", "icon"),
     Input("forecast-execute-button", "n_clicks"),
     State("commodity-radio", "value"),
     State("forecast-well-input", "value"),
     # prevent_initial_call=False,
 )
-def update_predict_plot(n_clicks, commodity, forecast_input: str):
+def update_predict_plot(toast_icon, n_clicks, commodity, forecast_input: str):
 
     # Convert input to DataFrame
     inputs = forecast_input.splitlines()
@@ -72,8 +73,6 @@ def update_predict_plot(n_clicks, commodity, forecast_input: str):
         com_radio.append("Oil")
     if dm.df_gas_prod is not None:
         com_radio.append("Gas")
-
-    com_value = com_radio[0] if len(com_radio) > 0 else []
 
     # Retrieve data from data_manager
     if commodity == "Oil":
@@ -125,7 +124,7 @@ def update_predict_plot(n_clicks, commodity, forecast_input: str):
             n_wells,
             DEFAULT_MONTHS,
             com_radio,
-            com_value,
+            commodity,
             toast_hist_prod,
             toast_hist_prod_icon,
             toast_hist_wells,
@@ -145,7 +144,12 @@ def update_predict_plot(n_clicks, commodity, forecast_input: str):
     # Fit Forecaster
     fc.y = y
     fc.X = X
-    if n_clicks == 1:
+
+    refit = (toast_icon == "success" and commodity == "Gas") or (
+        toast_icon == "danger" and commodity == "Oil"
+    )
+
+    if n_clicks == 1 or refit:
         # Fit model
         df_results = fc.fit()
 
@@ -198,7 +202,7 @@ def update_predict_plot(n_clicks, commodity, forecast_input: str):
         None,
         None,
         com_radio,
-        com_value,
+        commodity,
         toast_hist_prod,
         toast_hist_prod_icon,
         toast_hist_wells,

@@ -206,7 +206,7 @@ def generate_forecast_with_ci(
 
     fig.update_layout(
         yaxis_title=f"{commodity} Production ({units})",
-        title=generate_plot_title("Commodity Production Forecast and Well Data "),
+        title=generate_plot_title(f"{commodity} Production Forecast and Well Data "),
         hovermode="x",
         margin={"l": 25, "r": 25, "t": 50, "b": 50},
         modebar=CUSTOM_MODEBAR,
