@@ -4,6 +4,13 @@ import dash_bootstrap_components as dbc
 from utils.constants import COUNTIES, YEARS_RANGE
 
 # Declare cards for UI
+logo_card = dbc.Card(
+    [
+        dbc.CardImg(src="/assets/dva_team_logo.png", top=True),
+    ],
+    style={"height": "10vh", "padding-top":'10%',"padding-left":'10%', 'border':'0'}
+)
+
 instructions = [
     html.P("Use 'Explore' tab to make selections of data"),
     html.P("Fill forecast inputs required on the right"),
