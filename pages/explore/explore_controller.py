@@ -3,6 +3,7 @@ from dash import callback_context
 from dash.dependencies import Input, Output
 import plotly.graph_objects as go
 import plotly.express as px
+import numpy as np
 from plotly.subplots import make_subplots
 from utils.constants import (
     OIL_COLOR,
@@ -69,8 +70,13 @@ def update_map(map_type, commodity, activity, county, operators):
                 lon=df[dm.L_LONGITUDE],
                 text=df[dm.L_COUNTY],
                 radius=2,
+                customdata=np.stack([df[dm.L_LEASE_ID], df[dm.L_OPERATOR], df[dm.L_PRODUCES]], axis=-1),
                 showscale=False,
-                hovertemplate="<b>County: %{text}<br><extra></extra>",
+                hovertemplate="<b>County: %{text}<br>"
+                + "<b> Lease ID: #%{customdata[0]}<br>"
+                + "<b> Operator: %{customdata[1]}<br>"
+                + "<b> Produces: %{customdata[2]}<br>"
+                + "<extra></extra>",
             )
         )
     elif map_type == "Scatter Plot":

@@ -1,6 +1,7 @@
 from app import app
 import plotly.graph_objects as go
 import numpy as np
+import math
 import pandas as pd
 from plotly.subplots import make_subplots
 
@@ -19,6 +20,12 @@ from components.data_manager import DataManager
 # Debugging function to log input to Console
 def log(stuff):
     app.logger.info(stuff)
+
+def human_readable_numbers(nbr):
+    unt = ['', ' K', ' M', ' G', ' T', ' P']
+    k = 1000.0
+    mgn = int(math.floor(math.log(nbr, k)))
+    return '%.2f%s' % (nbr / k**mgn, unt[mgn])
 
 
 def scatter_commodity(df: pd.DataFrame, dm: DataManager, color: str, title: str):

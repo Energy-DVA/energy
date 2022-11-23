@@ -56,7 +56,7 @@ layout = [
                         dbc.Toast(
                             children="No Selection Made",
                             id="toast-hist-prod",
-                            header="Average Historical Production",
+                            header="Cumulative Historical Production",
                             icon="primary",
                             dismissable=False,
                             is_open=True,
@@ -69,7 +69,7 @@ layout = [
                         dbc.Toast(
                             children="No Selection Made",
                             id="toast-hist-wells",
-                            header="Average Historical Wells",
+                            header="Average Historical Well Count",
                             icon="dark",
                             dismissable=False,
                             is_open=True,
@@ -82,7 +82,7 @@ layout = [
                         dbc.Toast(
                             children="No Selection Made",
                             id="toast-fore-prod",
-                            header="Average Forecast Production",
+                            header="Cumulative Forecast Production",
                             icon="primary",
                             dismissable=False,
                             is_open=True,
@@ -95,7 +95,7 @@ layout = [
                         dbc.Toast(
                             children="No Selection Made",
                             id="toast-fore-wells",
-                            header="Average Forecast Wells",
+                            header="Average Forecast Well Count",
                             icon="secondary",
                             dismissable=False,
                             is_open=True,

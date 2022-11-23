@@ -7,7 +7,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from pages.explore.explore_model import dm
 from pages.predict.predict_model import fc
-from utils.functions import generate_forecast_with_ci
+from utils.functions import generate_forecast_with_ci, human_readable_numbers
 from utils.constants import (
     OIL_UNITS,
     GAS_UNITS,
@@ -105,8 +105,8 @@ def update_predict_plot(toast_icon, n_clicks, commodity, forecast_input: str):
     wells_arr = pd.DataFrame([n_wells] * pred_period)
 
     # Populate Toast elements (summation cards)
-    units = OIL_UNITS if commodity == "Oil" else GAS_UNITS
-    toast_hist_prod = str(np.mean(y_train).round(0)) + " " + units
+    units = 'bbl' if commodity == "Oil" else 'csf'
+    toast_hist_prod = human_readable_numbers(np.sum(y_train).round(0)) + units
     toast_hist_wells = str(int(np.mean(well_train))) + " wells"
     toast_fore_prod = "N/A"
     toast_fore_wells = "N/A"
@@ -183,7 +183,7 @@ def update_predict_plot(toast_icon, n_clicks, commodity, forecast_input: str):
     well_forecast = pd.Series(wells_arr.iloc[:, 0])
 
     # Populate Toast elements (summation cards)
-    toast_fore_prod = str(y_forecast.mean().round(0)) + " " + units
+    toast_fore_prod = human_readable_numbers(y_forecast.sum().round(0)) + units
     toast_fore_wells = str(int(np.mean(well_forecast))) + " wells"
 
     fig = generate_forecast_with_ci(

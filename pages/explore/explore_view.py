@@ -47,7 +47,7 @@ map_type_selection = dcc.Dropdown(
         {"label": "Scatter Plot of Individual Leases", "value": "Scatter Plot"},
         {"label": "Density Heatmap of Leases", "value": "Heat Map"},
     ],
-    value="Counties",
+    value="Scatter Plot",
 )
 
 
