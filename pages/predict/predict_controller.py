@@ -42,8 +42,8 @@ def update_user_input_to_textbox(
     State("forecast-well-input", "value"),
     # prevent_initial_call=False,
 )
-def update_predict_plot(n_clicks, commodity, forecast_input):
-
+def update_predict_plot(n_clicks, commodity, forecast_input: str):
+    log("test")
     # Convert input to DataFrame
     inputs = forecast_input.splitlines()
     header = ["wells", "months"]
@@ -52,9 +52,6 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
     else:
         vals = []
     df_user = pd.DataFrame(vals, columns=header)
-
-    if n_clicks is None:
-        raise PreventUpdate
 
     #############################################
     # TO REPLACE WITH FORECASTER IN THIS SECTION
@@ -66,6 +63,19 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
         X = dm.df_gas_prod[[dm.P_WELLS]]
     else:
         return ValueError("Invalid commodity")
+
+    # Prepare train data
+    x_train = pd.Series(y.index)
+    y_train = y.round(0)
+    well_train = pd.Series(X.iloc[:, 0])
+
+    if n_clicks is None:
+        return generate_forecast_with_ci(
+            commodity,
+            x_train,
+            y_train,
+            well_train,
+        )
 
     # Set Defaults
     n_wells = 9000
@@ -97,24 +107,22 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
     y = pd.concat([y, df_results[fc.RES_FORECAST].iloc[0:1]])
     X.loc[df_results.index[0], dm.P_WELLS] = wells_arr.iloc[0, 0]
     # Define sets and plot the figure
-    x_train = pd.Series(y.index)
+
     x_forecast = pd.Series(df_results.index)
-    y_train = y.round(0)
     y_forecast = df_results[fc.RES_FORECAST].round(0)
     y_upper = df_results[fc.RES_UPPER_INTERVAL].round(0)
     y_lower = df_results[fc.RES_LOWER_INTERVAL].round(0)
-    well_train = pd.Series(X.iloc[:, 0])
     well_forecast = pd.Series(wells_arr.iloc[:, 0])
 
     fig = generate_forecast_with_ci(
         commodity,
         x_train,
         y_train,
+        well_train,
         x_forecast,
         y_forecast,
         y_upper,
         y_lower,
-        well_train,
         well_forecast,
     )
 

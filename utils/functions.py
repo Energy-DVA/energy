@@ -78,12 +78,12 @@ def generate_forecast_with_ci(
     commodity,
     x_train,
     y_train,
-    x_forecast,
-    y_forecast,
-    y_upper,
-    y_lower,
     well_train,
-    well_forecast,
+    x_forecast=None,
+    y_forecast=None,
+    y_upper=None,
+    y_lower=None,
+    well_forecast=None,
 ):
 
     # Define Colors and units
@@ -115,94 +115,95 @@ def generate_forecast_with_ci(
         col=1,
     )
 
-    fig.add_trace(
-        go.Scatter(
-            x=x_forecast,
-            y=y_forecast,
-            mode="lines",
-            line=dict(color=forecast_color),
-            name="",
-            hovertemplate="Forecasted Production: %{y}" + f"{units}<br>",
-        ),
-        row=1,
-        col=1,
-    )
+    if x_forecast is not None:
+        fig.add_trace(
+            go.Scatter(
+                x=x_forecast,
+                y=y_forecast,
+                mode="lines",
+                line=dict(color=forecast_color),
+                name="",
+                hovertemplate="Forecasted Production: %{y}" + f"{units}<br>",
+            ),
+            row=1,
+            col=1,
+        )
 
-    fig.add_trace(
-        go.Scatter(
-            x=x_forecast,
-            y=y_upper,
-            mode="lines",
-            marker=dict(color=ci_line_color),
-            line=dict(width=1),
-            showlegend=False,
-            name="",
-            hovertemplate="Forecast Upper Bound: %{y}" + f"{units}<br>",
-        ),
-        row=1,
-        col=1,
-    )
+        fig.add_trace(
+            go.Scatter(
+                x=x_forecast,
+                y=y_upper,
+                mode="lines",
+                marker=dict(color=ci_line_color),
+                line=dict(width=1),
+                showlegend=False,
+                name="",
+                hovertemplate="Forecast Upper Bound: %{y}" + f"{units}<br>",
+            ),
+            row=1,
+            col=1,
+        )
 
-    fig.add_trace(
-        go.Scatter(
-            x=x_forecast,
-            y=y_lower,
-            marker=dict(color=ci_line_color),
-            line=dict(width=1),
-            mode="lines",
-            fillcolor=ci_fill_color,
-            fill="tonexty",
-            showlegend=False,
-            name="",
-            hovertemplate="Forecast Lower Bound: %{y}" + f"{units}<br>",
-        ),
-        row=1,
-        col=1,
-    )
+        fig.add_trace(
+            go.Scatter(
+                x=x_forecast,
+                y=y_lower,
+                marker=dict(color=ci_line_color),
+                line=dict(width=1),
+                mode="lines",
+                fillcolor=ci_fill_color,
+                fill="tonexty",
+                showlegend=False,
+                name="",
+                hovertemplate="Forecast Lower Bound: %{y}" + f"{units}<br>",
+            ),
+            row=1,
+            col=1,
+        )
 
-    fig.add_trace(
-        go.Scatter(
-            x=x_train,
-            y=well_train,
-            mode="lines",
-            line=dict(color=WELL_COLOR),
-            name="",
-            hovertemplate="Historical Well Count: %{y}<br>",
-        ),
-        row=2,
-        col=1,
-    )
+        fig.add_trace(
+            go.Scatter(
+                x=x_train,
+                y=well_train,
+                mode="lines",
+                line=dict(color=WELL_COLOR),
+                name="",
+                hovertemplate="Historical Well Count: %{y}<br>",
+            ),
+            row=2,
+            col=1,
+        )
 
-    fig.add_trace(
-        go.Scatter(
-            x=x_forecast,
-            y=well_forecast,
-            mode="lines",
-            line=dict(color=forecast_color),
-            name="",
-            hovertemplate="Forecasted Well Count: %{y}<br>",
-        ),
-        row=2,
-        col=1,
-    )
+        fig.add_trace(
+            go.Scatter(
+                x=x_forecast,
+                y=well_forecast,
+                mode="lines",
+                line=dict(color=forecast_color),
+                name="",
+                hovertemplate="Forecasted Well Count: %{y}<br>",
+            ),
+            row=2,
+            col=1,
+        )
 
-    # Add Vertical Lines
-    fig.add_vline(
-        x=x_forecast.iloc[0],
-        line_width=2,
-        line_dash="dot",
-        line_color="black",
-        row=1,
-        col=1,
-    )
-    fig.add_vline(
-        x=x_forecast.iloc[0],
-        line_width=2,
-        line_dash="dot",
-        line_color="black",
-        row=2,
-        col=1,
-    )
+        # Add Vertical Lines
+        fig.add_vline(
+            x=x_forecast.iloc[0],
+            line_width=2,
+            line_dash="dot",
+            line_color="black",
+            row=1,
+            col=1,
+        )
+        fig.add_vline(
+            x=x_forecast.iloc[0],
+            line_width=2,
+            line_dash="dot",
+            line_color="black",
+            row=2,
+            col=1,
+        )
 
     fig.update_layout(
         yaxis_title=f"{commodity} Production ({units})",
