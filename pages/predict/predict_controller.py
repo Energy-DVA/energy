@@ -5,6 +5,7 @@ from dash.exceptions import PreventUpdate
 import pandas as pd
 import plotly.graph_objects as go
 from pages.explore.explore_model import dm
+from pages.predict.predict_model import fc
 from components.forecaster import Forecaster
 from utils.functions import log, generate_forecast_with_ci
 
@@ -29,6 +30,10 @@ def update_user_input_to_textbox(submit_click, clear_click, well_months, num_wel
         
 
 @app.callback(
+    Output("predict-wells", "value"),
+    Output("predict-wells-month", "value"),
+    Output("commodity-radio", "options"),
+    Output("commodity-radio", "value"),
     Output("predict-plot", "figure"),
     Input("forecast-execute-button", "n_clicks"),
     State("commodity-radio", "value"),
@@ -36,6 +41,7 @@ def update_user_input_to_textbox(submit_click, clear_click, well_months, num_wel
     # prevent_initial_call=False,
 )
 def update_predict_plot(n_clicks, commodity, forecast_input: str):
+    
     # Convert input to DataFrame
     inputs = forecast_input.splitlines()
     header = ["wells", "months"]
@@ -44,6 +50,14 @@ def update_predict_plot(n_clicks, commodity, forecast_input: str):
     else:
         vals = []
     df_user = pd.DataFrame(vals, columns=header)
+
+    com_radio = []
+    if dm.df_oil_prod is not None:
+        com_radio.append("Oil")
+    if dm.df_gas_prod is not None:
+        com_radio.append("Gas")
+
+    com_value = com_radio[0] if len(com_radio) > 0 else []
 
     #############################################
     # TO REPLACE WITH FORECASTER IN THIS SECTION
@@ -56,8 +70,10 @@ def update_predict_plot(n_clicks, commodity, forecast_input: str):
     else:
         if dm.df_oil_prod is not None:
             y = dm.df_oil_prod[dm.CV_P_CAL_DAY_PROD]
+            X = dm.df_oil_prod[[dm.P_WELLS]]
         elif dm.df_gas_prod is not None:
             y = dm.df_gas_prod[dm.CV_P_CAL_DAY_PROD]
+            X = dm.df_gas_prod[[dm.P_WELLS]]
         else:
             return ValueError("No commodity selected")
 
@@ -66,18 +82,20 @@ def update_predict_plot(n_clicks, commodity, forecast_input: str):
     y_train = y.round(0)
     well_train = pd.Series(X.iloc[:, 0])
 
+    # Set Defaults
+    n_wells = X.iloc[-1,0]
+    DEFAULT_MONTHS = 36
+    pred_period = 1 if n_clicks is None else DEFAULT_MONTHS
+    wells_arr = pd.DataFrame([n_wells] * pred_period)
+
     if n_clicks is None:
-        return generate_forecast_with_ci(
+        return n_wells, DEFAULT_MONTHS, com_radio, com_value, generate_forecast_with_ci(
             commodity,
             x_train,
             y_train,
             well_train,
         )
 
-    # Set Defaults
-    n_wells = 9000
-    pred_period = 1 if n_clicks is None else 36
-    wells_arr = pd.DataFrame([n_wells] * pred_period)
 
     # Override defaults with user inputs
     if len(df_user) > 0:
@@ -88,8 +106,15 @@ def update_predict_plot(n_clicks, commodity, forecast_input: str):
         wells_arr = pd.DataFrame(wells_arr)
 
     # Fit Forecaster
-    fc = Forecaster(y, X)
-    df_results = fc.fit_predict(pred_period, wells_arr)
+    fc.y = y
+    fc.X = X
+    if n_clicks == 1:
+        # Fit model
+        df_results = fc.fit()
+
+    # Predict
+    df_results = fc.predict(pred_period, wells_arr)
+        
     #########################################
 
     # If values go below 0, set it to 0
@@ -128,4 +153,4 @@ def update_predict_plot(n_clicks, commodity, forecast_input: str):
         well_forecast,
     )
 
-    return fig
+    return None, None, com_radio, com_value, fig

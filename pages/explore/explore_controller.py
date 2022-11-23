@@ -118,6 +118,9 @@ def update_map(map_type, commodity, activity, county, operators):
 )
 def update_plot(commodity, activity, county, operators, selection):
 
+    dm.df_oil_prod = None
+    dm.df_gas_prod = None
+
     # Handle error
     if len(commodity) == 0:
         return generate_empty_plot()
