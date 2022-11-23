@@ -9,14 +9,14 @@ tabs = html.Div(
         value="page_explore",
         children=[
             dcc.Tab(
-                label="Explore",
+                label="EXPLORE",
                 value="page_explore",
                 id="page-explore",
                 className="custom-tab",
                 selected_className="custom-tab--selected",
             ),
             dcc.Tab(
-                label="Predict",
+                label="PREDICT",
                 value="page_predict",
                 id="page-predict",
                 className="custom-tab",
