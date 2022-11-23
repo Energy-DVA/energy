@@ -37,27 +37,72 @@ sidebar = dbc.Row(
 
 layout = [
     html.Br(),
-    dbc.CardGroup(
+    dbc.Row(
         [
-            dbc.Card(
-                [
-                    dbc.CardHeader("Production Forecasting"),
-                    dbc.CardBody(
-                        [
-                            dbc.Row(
-                                dcc.Loading(
-                                    dcc.Graph(
-                                        id="predict-plot",
-                                        style={"padding-top": "1%"},
-                                    ),
-                                    id="loading-1",
-                                    type="default",
-                                )
-                            ),
-                        ]
-                    ),
-                ]
+            dbc.Col(
+                dbc.Card(
+                    [
+                        dbc.CardHeader("Production Forecasting"),
+                        dbc.CardBody(
+                            [
+                                dbc.Row(
+                                    dcc.Loading(
+                                        dcc.Graph(
+                                            id="predict-plot",
+                                            style={"padding-top": "1%"},
+                                        ),
+                                        id="loading-1",
+                                        type="default",
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
+                ),
+                width=9,
             ),
+            dbc.Col(
+                [
+                    dbc.Row(
+                        dbc.Toast(
+                            [
+                                html.P("This is the content of the toast", className="mb-0")
+                            ],
+                            id="simple-toast",
+                            header="This is the header",
+                            icon="primary",
+                            dismissable=False,
+                            is_open=True,
+                        ),
+                    ),
+                    html.Br(),
+                    dbc.Row(
+                        dbc.Toast(
+                            [
+                                html.P("This is the content of the toast", className="mb-0")
+                            ],
+                            id="siadfa",
+                            header="This is the header",
+                            icon="primary",
+                            dismissable=False,
+                            is_open=True,
+                        ),
+                    ),
+                    html.Br(),
+                    dbc.Row(
+                        dbc.Toast(
+                            [
+                                html.P("This is the content of the toast", className="mb-0")
+                            ],
+                            id="simadfast",
+                            header="This is the header",
+                            icon="primary",
+                            dismissable=False,
+                            is_open=True,
+                        ),
+                    ),
+                ],
+            )
         ]
     ),
 ]
