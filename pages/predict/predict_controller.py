@@ -33,22 +33,18 @@ def update_user_input_to_textbox(submit_click, clear_click, well_months, num_wel
     Input("forecast-execute-button", "n_clicks"),
     State("commodity-radio", "value"),
     State("forecast-well-input", "value"),
-    #prevent_initial_call=False,
+    # prevent_initial_call=False,
 )
-def update_predict_plot(n_clicks, commodity, forecast_input):
-    
+def update_predict_plot(n_clicks, commodity, forecast_input: str):
     # Convert input to DataFrame
     inputs = forecast_input.splitlines()
-    header = ['wells','months']
+    header = ["wells", "months"]
     if len(inputs) > 1:
-        vals = [[int(x.split(',')[0]),int(x.split(',')[1])] for x in inputs[1:]]
+        vals = [[int(x.split(",")[0]), int(x.split(",")[1])] for x in inputs[1:]]
     else:
         vals = []
     df_user = pd.DataFrame(vals, columns=header)
-        
-    # if n_clicks is None:
-    #     raise PreventUpdate
-    
+
     #############################################
     # TO REPLACE WITH FORECASTER IN THIS SECTION
     if commodity == "Oil":
@@ -58,22 +54,39 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
         y = dm.df_gas_prod[dm.CV_P_CAL_DAY_PROD]
         X = dm.df_gas_prod[[dm.P_WELLS]]
     else:
-        return ValueError("Invalid commodity")
+        if dm.df_oil_prod is not None:
+            y = dm.df_oil_prod[dm.CV_P_CAL_DAY_PROD]
+        elif dm.df_gas_prod is not None:
+            y = dm.df_gas_prod[dm.CV_P_CAL_DAY_PROD]
+        else:
+            return ValueError("No commodity selected")
+
+    # Prepare train data
+    x_train = pd.Series(y.index)
+    y_train = y.round(0)
+    well_train = pd.Series(X.iloc[:, 0])
+
+    if n_clicks is None:
+        return generate_forecast_with_ci(
+            commodity,
+            x_train,
+            y_train,
+            well_train,
+        )
 
     # Set Defaults
     n_wells = 9000
-    pred_period = 1 if n_clicks == None else 36 
+    pred_period = 1 if n_clicks is None else 36
     wells_arr = pd.DataFrame([n_wells] * pred_period)
-    
+
     # Override defaults with user inputs
     if len(df_user) > 0:
-        pred_period = int(df_user['months'].sum())
+        pred_period = int(df_user["months"].sum())
         wells_arr = []
         for row in df_user.itertuples():
-            print(row)
             wells_arr += [int(row.wells)] * int(row.months)
         wells_arr = pd.DataFrame(wells_arr)
-    
+
     # Fit Forecaster
     fc = Forecaster(y, X)
     df_results = fc.fit_predict(pred_period, wells_arr)
@@ -89,29 +102,30 @@ def update_predict_plot(n_clicks, commodity, forecast_input):
 
     # To ensure connectivity on graph, append last value from train to forecast
     y = pd.concat([y, df_results[fc.RES_FORECAST].iloc[0:1]])
-
-    # Define sets and plot the figure
+    X.loc[df_results.index[0], dm.P_WELLS] = wells_arr.iloc[0, 0] 
+    
+    # Prepare train data (replicated to handle First load case)
     x_train = pd.Series(y.index)
-    x_forecast = pd.Series(df_results.index)
     y_train = y.round(0)
+    well_train = pd.Series(X.iloc[:, 0])
+    
+    # Define sets and plot the figure
+    x_forecast = pd.Series(df_results.index)
     y_forecast = df_results[fc.RES_FORECAST].round(0)
     y_upper = df_results[fc.RES_UPPER_INTERVAL].round(0)
     y_lower = df_results[fc.RES_LOWER_INTERVAL].round(0)
-    well_train = pd.Series(X.iloc[:, 0])
     well_forecast = pd.Series(wells_arr.iloc[:, 0])
 
     fig = generate_forecast_with_ci(
         commodity,
         x_train,
         y_train,
+        well_train,
         x_forecast,
         y_forecast,
         y_upper,
         y_lower,
-        well_train,
         well_forecast,
     )
 
     return fig
-
-
