@@ -6,7 +6,7 @@ from app import app
 
 from pages.explore import explore_view
 from pages.predict import predict_view
-
+import runpy
 
 @app.callback(
     Output("sidebar", "children"),
@@ -20,6 +20,8 @@ def render_page_content(tabvalue):
             explore_view.layout,
         )
     elif tabvalue == "page_predict":
+        print("test")
+        runpy.run_module(predict_view)
         return (
             predict_view.sidebar,
             predict_view.layout,

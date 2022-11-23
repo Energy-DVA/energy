@@ -62,7 +62,12 @@ def update_predict_plot(n_clicks, commodity, forecast_input: str):
         y = dm.df_gas_prod[dm.CV_P_CAL_DAY_PROD]
         X = dm.df_gas_prod[[dm.P_WELLS]]
     else:
-        return ValueError("Invalid commodity")
+        if dm.df_oil_prod is not None:
+            y = dm.df_oil_prod[dm.CV_P_CAL_DAY_PROD]
+        elif dm.df_gas_prod is not None:
+            y = dm.df_gas_prod[dm.CV_P_CAL_DAY_PROD]
+        else:
+            return ValueError("No commodity selected")
 
     # Prepare train data
     x_train = pd.Series(y.index)
