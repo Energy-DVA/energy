@@ -2,6 +2,7 @@ import pandas as pd
 from components.data_manager import DataManager
 from components.forecaster import Forecaster
 import matplotlib.pyplot as plt
+
 #%% Create data manager
 db_path = "/data/kansas_oil_gas_1.db"
 db_type = "sqlite"

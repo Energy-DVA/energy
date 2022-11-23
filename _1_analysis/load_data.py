@@ -51,9 +51,7 @@ df_wells["MODIFIED"] = pd.to_datetime(df_wells["MODIFIED"])
 #%% Write to sql
 df_wells.to_sql(WELLS_TABLE, engine, if_exists="replace", index=False)
 #%% Read well tops
-df_tops = pd.read_csv("data/ks_tops.txt", header=0).drop(
-    DROP_TOPS_COLS, axis=1
-)
+df_tops = pd.read_csv("data/ks_tops.txt", header=0).drop(DROP_TOPS_COLS, axis=1)
 #%% Parse dates
 df_tops["UPDATED"] = pd.to_datetime(df_tops["UPDATED"])
 #%% Find duplicates in tops

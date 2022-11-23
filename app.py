@@ -12,5 +12,3 @@ app = dash.Dash(
 )
 
 app.layout = layout
-
-#COSMO, LUX, JOURNAL, FLATLY

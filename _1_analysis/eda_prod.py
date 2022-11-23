@@ -28,9 +28,7 @@ df_oil_prod["N_DAYS"] = df_oil_prod["DATE"].dt.daysinmonth
 #%% Set date as index
 df_oil_prod = df_oil_prod.set_index("DATE").sort_index()
 #%% Calculate the calendar day production
-df_oil_prod["CAL_DAY_PROD"] = (
-    df_oil_prod["MONTHLY_OIL_PROD"] / df_oil_prod["N_DAYS"]
-)
+df_oil_prod["CAL_DAY_PROD"] = df_oil_prod["MONTHLY_OIL_PROD"] / df_oil_prod["N_DAYS"]
 #%% Plot the calendar day production
 df_oil_prod.plot(y="CAL_DAY_PROD", figsize=(12, 8))
 plt.show()
