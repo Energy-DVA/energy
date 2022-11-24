@@ -24,8 +24,7 @@ def log(stuff):
 
 def cumulative_production(daily_prod):
     cum = []
-    print(daily_prod)
-    for idx,value in daily_prod.iteritems():
+    for idx,value in daily_prod.items():
         cum.append(value*idx.days_in_month)
     return sum(cum)
 

@@ -105,7 +105,7 @@ def update_predict_plot(toast_icon, n_clicks, commodity, forecast_input: str):
     wells_arr = pd.DataFrame([n_wells] * pred_period)
 
     # Populate Toast elements (summation cards)
-    units = 'bbl' if commodity == "Oil" else 'Mcsf'
+    units = 'bbl' if commodity == "Oil" else 'Mscf'
     toast_hist_prod = human_readable_numbers(round(cumulative_production(y_train),0)) + units
     toast_hist_wells = str(int(np.mean(well_train))) + " wells"
     toast_fore_prod = "N/A"

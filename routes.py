@@ -24,7 +24,5 @@ def render_page_content(tabvalue):
             predict_view.sidebar,
             predict_view.layout,
         )
-    # elif tabvalue == 'page_compare':
-    #     return iris.layout
     else:
-        return "adfadfadfadfadfadfadf", "ERROR"
+        return "You should NOT be seeing this!", "ERROR"

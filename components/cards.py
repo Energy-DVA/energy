@@ -67,7 +67,14 @@ predict_forecast_time_card = dbc.Card(
 
 predict_forecast_wells_card = dbc.Card(
     [
-        dbc.CardHeader("Choose (multiple inputs possible):"),
+        dbc.CardHeader(
+            [
+                "Construct Wells Array:", 
+                html.I(className="bi bi-info-circle-fill",
+                       id="tooltip-forecast-button",
+                       style={'margin-left':'0.5vw'})
+            ]
+        ),
         dbc.CardBody(
             [
                 dbc.Row(
@@ -82,7 +89,7 @@ predict_forecast_wells_card = dbc.Card(
                                     value=None,
                                     debounce=True,
                                 ),
-                                dbc.FormText("Num. of Wells"),
+                                dbc.FormText("Input num. of wells..."),
                             ],
                             width=3,
                         ),
@@ -96,7 +103,7 @@ predict_forecast_wells_card = dbc.Card(
                                     value=None,
                                     debounce=True,
                                 ),
-                                dbc.FormText("for time period (months)"),
+                                dbc.FormText("for a period (months) of..."),
                             ],
                             width=3,
                         ),
@@ -109,24 +116,24 @@ predict_forecast_wells_card = dbc.Card(
                                     size="sm",
                                     color="secondary",
                                 ),
+                                html.Br(),
+                                dbc.FormText("and append..."),
                             ],
                             width="auto",
                         ),
                         dbc.Col(
                             [
-                                dcc.Textarea(
+                                dbc.Textarea(
                                     id="forecast-well-input",
                                     value="Number of Wells, Months",
                                     disabled=True,
                                     className="text-area",
                                     style={
-                                        "resize": "vertical",
-                                        "width": "100%",
-                                        "padding-left": "0.5vw",
+                                        "padding-left": "0.75vw",
                                     },
                                 ),
+                                dbc.FormText("to create array of input pairs"),
                             ],
-                            width="auto",
                         ),
                         dbc.Col(
                             [
