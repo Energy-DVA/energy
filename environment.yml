@@ -8,5 +8,5 @@ dependencies:
   - geojson
   - sqlalchemy
   - dash
-  - dash-boostrap-components
+  - dash-bootstrap-components
   - pmdarima
