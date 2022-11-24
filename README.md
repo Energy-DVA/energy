@@ -2,6 +2,7 @@
 ### Kansas Oil and Gas Exploration and Forecasting
 #### Team 29: Efrain Rodriguez, Nikhil Kanoor, Geetak Ingle, Jagath Jonnalagedda, Oscar Cortez, Sheena Abraham
 
+
 1) DESCRIPTION
 
 This package contains Team 29's project submission. It contains the Final Report, Project Poster, and the source code for a Web Application that allows users to explore and predict the Oil and Gas Production for the state of Kansas. Refer to the Final Report for more details
@@ -9,6 +10,7 @@ This package contains Team 29's project submission. It contains the Final Report
 The DOC folder contains all the documentation. It contains the Final Report and the Poster
 
 The CODE folder contains all the source code that is required to run the Web App. Follow the INSTALLATION section below to setup the environment and data files. The source code is split into many folders and files for easier development, but the entry point for the app is through 'index.py'. Any execution of the Web App requires execution through this CODE folder
+
 
 2) INSTALLATION
 
@@ -34,6 +36,7 @@ The base folder for the Web App setup will be the accompanying 'CODE' folder. Pl
 
 The environment is now ready for execution
 
+
 3) EXECUTION
 
 The Web App is built upon the Dash framework. As such, a Flask Server first needs to be initialized that serves the Web App. Use the instructions below to start-up the Web App. Please ensure all INSTALLATION steps above have been completed
@@ -56,4 +59,10 @@ See video located at LINKLINKLINKLINKLINKLINKLINK for a demo on installation and
 5) ADDITIONAL INFORMATION
 This section contains supplementary information on Data Sources, Data ETL scripts, Web App SQLite file creation, Exploratory Data Analysis, and Model Creation.
 
-- Data Sources: All the data required for this project is available for public access from https://www.kgs.ku.edu/PRS/petroDB.html. Data is obtained from the 'Master List of Oil and Gas Wells in Kansas' and was accessed in September 2022. 
+- Data Sources: All the data required for this project is available for public access from https://www.kgs.ku.edu/PRS/petroDB.html. Data is obtained from the 'Master List of Oil and Gas Wells in Kansas' and was accessed in September 2022. All the data used is in the 'data.zip' file that is downloaded in Step 1 of the INSTALLATION procedure. The Web App uses cleaned and transformed data located in SQLite file 'kansas_oil_gas.db'
+
+- ETL and Cleanup: The scripts required to clean and transform the raw data into the SQLite file is located in '_1_analysis'. If you wish to recreate the SQLite file, you will need to first run 'pip install prodphecy' in the CODE folder (to install the prodphecy package). The 'load_data.py' will execute the ETL.
+
+- Exploratory Data Analysis: EDA Jupyter Notebooks are located in '_1_analysis' folder
+
+- Model Creation: The Time Series Analysis (TSA) model scripts and Jupyter Notebooks used to forecast production are located in '_1_analysis' folder
