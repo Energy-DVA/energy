@@ -43,7 +43,7 @@ The Web App is built upon the Dash framework. As such, a Flask Server first need
 
     4. Open your favorite web browser (Chrome, Firefox, etc.) and enter the link 'http://127.0.0.1:8888' and press Enter
     
-The Web Application has now successfully been served on 'localhost' at port 8888 and is ready for use.
+The Web Application has now successfully been served at address '127.0.0.1' at port '8888' and is ready for use. The Web App can now be used to explore oil and gas data from Kansas, as well as make predictive forecasts.
 
 
 4) DEMO VIDEO
