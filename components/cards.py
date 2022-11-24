@@ -208,7 +208,7 @@ active_card = dbc.Card(
                                         "placement": "bottom",
                                         "always_visible": True,
                                     },
-                                    pushable=5,
+                                    pushable=1,
                                 ),
                             ],
                         ),
