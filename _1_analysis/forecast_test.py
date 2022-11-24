@@ -4,7 +4,7 @@ from components.forecaster import Forecaster
 import matplotlib.pyplot as plt
 
 #%% Create data manager
-db_path = "/data/kansas_oil_gas_1.db"
+db_path = "/data/kansas_oil_gas.db"
 db_type = "sqlite"
 dm = DataManager(db_type, db_path)
 #%% Get all production data
