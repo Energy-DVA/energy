@@ -21,8 +21,17 @@ from components.data_manager import DataManager
 def log(stuff):
     app.logger.info(stuff)
 
+
+def cumulative_production(daily_prod):
+    cum = []
+    print(daily_prod)
+    for idx,value in daily_prod.iteritems():
+        cum.append(value*idx.days_in_month)
+    return sum(cum)
+
+
 def human_readable_numbers(nbr):
-    unt = ['', ' K', ' M', ' G', ' T', ' P']
+    unt = ['', ' M', ' MM', ' MMM', ' MMMM', ' MMMMM']
     k = 1000.0
     mgn = int(math.floor(math.log(nbr, k)))
     return '%.2f%s' % (nbr / k**mgn, unt[mgn])
