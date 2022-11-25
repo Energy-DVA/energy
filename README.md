@@ -53,7 +53,7 @@ The Web Application has now successfully been served at address '127.0.0.1' at p
 
 
 4) DEMO VIDEO
-See video located at LINKLINKLINKLINKLINKLINKLINK for a demo on installation and execution of the Web Application
+See video located at https://youtu.be/D06Wsd_R9EA for a demo on installation and execution of the Web Application
 
 
 5) ADDITIONAL INFORMATION
